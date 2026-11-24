@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';">
+  <meta name="referrer" content="no-referrer">
+  <title>Ch 14: Spec-First Agentic Co-Design — Prove It (Indicogni)</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-unit-id="14" data-unit-title="Ch 14: Spec-First Agentic Co-Design" data-prev-href="13.html" data-next-href="15.html">
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand-link" href="../index.html">
+      <span class="brand-org">indicogni</span>
+      <span class="brand-sep">/</span>
+      <span class="brand-title">Prove It</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="../index.html#curriculum" aria-current="page">Curriculum</a>
+      <a class="nav-link" href="../labs/index.html">6 Live Labs</a>
+      <a class="nav-link" href="../capstones/index.html">4 Capstones</a>
+      <a class="nav-link" href="../reference/tla-to-lean.html">TLA+ ↔ Lean</a>
+      <a class="nav-link" href="../reference/ai-playbook.html">AI Playbook</a>
+      <a class="nav-link" href="../reference/glossary.html">Glossary</a>
+    </nav>
+    <div class="nav-controls">
+      <span class="progress-pill" data-progress-summary>0/20 units · 0/6 labs</span>
+      <button type="button" class="icon-btn" data-action="open-shortcuts" title="Keyboard shortcuts (?)">Shortcuts (?)</button>
+      <button type="button" class="icon-btn" data-action="toggle-theme">Dark theme (t)</button>
+    </div>
+  </div>
+</header>
+<main class="chapter-shell">
+  <div class="chapter-header">
+    <div class="chapter-topbar">
+      <span class="badge badge-accent">Part IV · AI-Native Verification &amp; Transfer</span>
+      <span class="badge">Ch 14 · 30 min · <code>ProveIt/Ch14.lean</code></span>
+    </div>
+    <h1>Spec-First Agentic Co-Design</h1>
+    <p class="hero-subtitle">Structuring `Spec.lean` vs `Impl.lean` so untrusted coding agents synthesize fast code and proofs at 10x speed safely.</p>
+
+    <div class="puzzle-box">
+      <span class="puzzle-title">5-Line Workflow Architecture · Who Owns What in AI Vericoding?</span>
+      <pre><code>-- File 1 (Human-Owned, SHA-256 Locked in CI): `Spec.lean`
+--   Defines domain types, reference semantics `specFn`, and `ValidInput`.
+-- File 2 (Agent-Editable, Untrusted): `Impl.lean`
+--   Defines optimized `implFn` + proves `impl_refines_spec` + `validInput_nonvacuous`.</code></pre>
+    </div>
+
+    <section class="prediction-card" id="prediction-card" aria-labelledby="pred-heading">
+      <div class="prediction-header">
+        <strong id="pred-heading">Socratic Gate · Commit to a Prediction</strong>
+        <span class="badge badge-open" data-prediction-status>Unanswered · Locks on commit</span>
+      </div>
+      <p>Why should `Spec.lean` require BOTH a soundness theorem (`impl r = some y → Valid r y`) AND a completeness/liveness theorem (` Satisfiable r → (impl r).isSome`)?</p>
+      <div class="prediction-options" data-prediction-options></div>
+      <button type="button" class="btn btn-primary btn-sm" data-action="lock-prediction" disabled>Lock Prediction &amp; Reveal Mechanism</button>
+      <div class="prediction-reveal" data-prediction-reveal hidden>
+        <strong>Why this happens:</strong>
+        <p data-prediction-explanation></p>
+      </div>
+    </section>
+  </div>
+
+  <article class="container-prose">
+    <h2>The Vericoding Division of Labor</h2>
+    <p>Humans are terrible at typing 200 lines of repetitive case-analysis tactics; LLMs are fast at tactic search and optimization synthesis, yet unreliable when allowed to invent their own acceptance criteria. Splitting every verified subsystem into a read-only <code>Spec.lean</code> (domain types + tiny reference function + soundness/completeness signature) and an agent-writable <code>Impl.lean</code> gives you AI velocity with mathematical certainty.</p>
+    <h2>Feeding Stuck Infoview States Back to Agents</h2>
+    <p>When Lean&#x27;s language server or <code>lake build</code> reports an exact unresolved Infoview goal (<code>x : Nat, h : x &gt; 0 ⊢ ...</code>), pasting that structured goal + our Chapter 07 3-Way Triage prompt (see the Reference AI Playbook) lets an agent repair leaf lemmas in 2–3 turns instead of hallucinating blind rewrites.</p>
+
+  </article>
+
+  <section class="workbench" id="chapter-workbench" aria-label="Interactive Lean 4 Infoview Stepper">
+    <div class="workbench-toolbar">
+      <div class="workbench-title">
+        <span>⊢</span>
+        <span>ProveIt/Ch14.lean · Soundness + Completeness Spec Contract</span>
+      </div>
+      <div class="stepper-controls">
+        <button type="button" class="btn btn-sm" data-action="step-reset">⏮ Reset</button>
+        <button type="button" class="btn btn-sm" data-action="step-prev">← Prev (k)</button>
+        <span class="step-counter" data-step-counter>Step 1 / 1</span>
+        <button type="button" class="btn btn-sm btn-primary" data-action="step-next">Next (j) →</button>
+      </div>
+    </div>
+
+    <div class="workbench-split">
+      <div class="code-pane" aria-label="Lean 4 source code">
+        <div class="code-lines" data-code-lines></div>
+      </div>
+      <div class="infoview-pane" aria-live="polite" aria-label="Simulated Lean 4 Infoview">
+        <div class="infoview-header">
+          <span class="infoview-title">Lean Infoview</span>
+          <span class="badge badge-open" data-goal-badge>Open Goal</span>
+        </div>
+        <div>
+          <span class="infoview-section-label">Objects</span>
+          <div class="infoview-block" data-infoview-objects></div>
+        </div>
+        <div>
+          <span class="infoview-section-label">Hypotheses</span>
+          <div class="infoview-block" data-infoview-hyps></div>
+        </div>
+        <div>
+          <span class="infoview-section-label">⊢ Current Goal</span>
+          <div class="infoview-block infoview-goal" data-infoview-goal></div>
+        </div>
+        <div class="infoview-note" data-infoview-note></div>
+      </div>
+    </div>
+
+    <div class="workbench-footer">
+      <div class="action-group">
+        <a class="btn btn-primary btn-sm" data-playground-link href="https://live.lean-lang.org/#code=--%20Chapter%2014%3A%20Spec-First%20Agentic%20Co-Design%0Adef%20specFee%20%28vol%20%3A%20Nat%29%20%3A%20Nat%20%3A%3D%0A%20%20if%20vol%20%3C%201000%20then%20vol%20%2A%203%20%2F%20100%20else%20vol%20%2A%201%20%2F%20100%0A%0A--%20Notice%20a%20lazy%20agent%20returning%20%60none%60%20CANNOT%20satisfy%20%60implFee%20vol%20%3D%20some%20%28specFee%20vol%29%60%21%0Adef%20implFee%20%28vol%20%3A%20Nat%29%20%3A%20Option%20Nat%20%3A%3D%0A%20%20some%20%28if%20vol%20%3C%201000%20then%20%28vol%20%2A%203%29%20%2F%20100%20else%20vol%20%2F%20100%29%0A%0Atheorem%20implFee_exact%20%28vol%20%3A%20Nat%29%20%3A%0A%20%20%20%20implFee%20vol%20%3D%20some%20%28specFee%20vol%29%20%3A%3D%20by%0A%20%20unfold%20implFee%20specFee%0A%20%20split%20%3C%3B%3E%20simp%20only%20%5BNat.mul_one%5D%0A" target="_blank" rel="noopener noreferrer">Run in Lean 4 Playground ↗</a>
+        <button type="button" class="btn btn-sm" data-action="copy-lean">Copy Lean snippet</button>
+      </div>
+      <div class="action-group">
+        <button type="button" class="btn btn-sm" data-copy-text="lake exe check ch14">Copy local command: <code>lake exe check ch14</code></button>
+      </div>
+    </div>
+  </section>
+
+  <div class="container-prose">
+    <div class="callout callout-verified">
+      <strong>Hands-On Exercise (ProveIt/Ch14.lean):</strong>
+      <p>In `ProveIt/Ch14.lean`, complete an `Impl` module against a locked `Spec` contract including soundness, completeness, and non-vacuity.</p>
+    </div>
+
+    <div class="chapter-complete-bar">
+      <div>
+        <strong>Finished the Socratic gate, Infoview trace, and playground run?</strong><br>
+        <span>Record completion in local browser storage to track your 20-unit progress.</span>
+      </div>
+      <button type="button" class="btn btn-verified" data-action="toggle-complete">Mark chapter complete</button>
+    </div>
+
+    <nav class="chapter-pager" aria-label="Chapter pagination">
+      <a class="pager-card" href="13.html"><span class="pager-dir">← Previous ([) · Ch 13</span><span class="pager-title">How AI Cheats Formal Verification</span></a>
+      <a class="pager-card align-right" href="15.html"><span class="pager-dir">Next (]) · Ch 15 →</span><span class="pager-title">Verified Wire Formats (TLV Framing)</span></a>
+    </nav>
+  </div>
+</main>
+<div class="modal-backdrop" id="shortcut-modal" hidden role="dialog" aria-modal="true" aria-labelledby="shortcut-modal-title">
+  <div class="modal-dialog">
+    <div class="prediction-header">
+      <h3 id="shortcut-modal-title">Keyboard Shortcuts</h3>
+      <button type="button" class="btn btn-sm" data-action="close-shortcuts">Close (Esc)</button>
+    </div>
+    <div class="shortcut-row"><span>Step tactic forward in Infoview</span><kbd>j</kbd></div>
+    <div class="shortcut-row"><span>Step tactic backward in Infoview</span><kbd>k</kbd></div>
+    <div class="shortcut-row"><span>Previous unit / chapter</span><kbd>[</kbd></div>
+    <div class="shortcut-row"><span>Next unit / chapter</span><kbd>]</kbd></div>
+    <div class="shortcut-row"><span>Toggle Light / Dark theme</span><kbd>t</kbd></div>
+    <div class="shortcut-row"><span>Open or close this help dialog</span><kbd>?</kbd></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <strong>Indicogni LLC</strong> · <em>Prove It: Formally Verified Software in Lean 4</em><br>
+      Pinned to zero-dependency Core/<code>Std</code> Lean <code>v4.36.0</code>. Zero cookies, zero analytics, zero tracking.
+    </div>
+    <div>
+      Code: MIT · Prose &amp; SVG Diagrams: CC BY 4.0 · Feedback &amp; security: <code>feedback@indicogni.com</code><br>
+      <a href="https://github.com/indicogni/prove-it" target="_blank" rel="noopener noreferrer">github.com/indicogni/prove-it</a> ·
+      <a href="https://live.lean-lang.org/" target="_blank" rel="noopener noreferrer">live.lean-lang.org</a>
+    </div>
+  </div>
+</footer>
+  <script type="module" src="../assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';">
+  <meta name="referrer" content="no-referrer">
+  <title>Earned-Jargon Glossary — Prove It (Indicogni)</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand-link" href="../index.html">
+      <span class="brand-org">indicogni</span>
+      <span class="brand-sep">/</span>
+      <span class="brand-title">Prove It</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="../index.html#curriculum">Curriculum</a>
+      <a class="nav-link" href="../labs/index.html">6 Live Labs</a>
+      <a class="nav-link" href="../capstones/index.html">4 Capstones</a>
+      <a class="nav-link" href="../reference/tla-to-lean.html">TLA+ ↔ Lean</a>
+      <a class="nav-link" href="../reference/ai-playbook.html">AI Playbook</a>
+      <a class="nav-link" href="../reference/glossary.html" aria-current="page">Glossary</a>
+    </nav>
+    <div class="nav-controls">
+      <span class="progress-pill" data-progress-summary>0/20 units · 0/6 labs</span>
+      <button type="button" class="icon-btn" data-action="open-shortcuts" title="Keyboard shortcuts (?)">Shortcuts (?)</button>
+      <button type="button" class="icon-btn" data-action="toggle-theme">Dark theme (t)</button>
+    </div>
+  </div>
+</header>
+<main class="container-wide">
+  <span class="eyebrow">Plain-English First, Jargon Second</span>
+  <h1>Earned-Jargon Glossary</h1>
+  <p class="hero-subtitle">
+    Every formal term in <em>Prove It</em> is earned by solving a concrete engineering problem first. Filter by course part or search any Lean, TLA+, or verification concept below.
+  </p>
+
+  <div class="filter-bar">
+    <input type="search" class="search-input" data-filter-input placeholder="Filter terms (e.g., Subtype, Garden-of-Eden, LRAT, stuttering, TCB)...">
+    <button type="button" class="btn btn-sm btn-primary" data-filter-cat="all">All Parts</button>
+    <button type="button" class="btn btn-sm" data-filter-cat="part-i">Part I</button>
+    <button type="button" class="btn btn-sm" data-filter-cat="part-ii">Part II</button>
+    <button type="button" class="btn btn-sm" data-filter-cat="part-iii">Part III</button>
+    <button type="button" class="btn btn-sm" data-filter-cat="part-iv">Part IV</button>
+  </div>
+  <p class="step-counter" data-filter-count></p>
+
+  <div class="glossary-grid">
+    <article class="card card-elevated" data-filter-item data-cat="part-i">
+      <div class="prediction-header">
+        <span class="badge badge-accent">Part I</span>
+        <a href="../chapters/01.html">Earned in unit →</a>
+      </div>
+      <h3>Total Function</h3>
+      <p><strong>Plain-English Meaning:</strong> A function guaranteed to return a valid output for every possible input of its parameter types—never throwing exceptions, looping forever, or dereferencing null.</p>
+      <p><strong>Lean 4 Mechanism:</strong> <code>Default for all `def` functions in Lean 4 (Ch 01).</code></p>
+    </article>
+    <article class="card card-elevated" data-filter-item data-cat="part-i">
+      <div class="prediction-header">
+        <span class="badge badge-accent">Part I</span>
+        <a href="../chapters/01.html">Earned in unit →</a>
+      </div>
+      <h3>Saturating Subtraction</h3>
+      <p><strong>Plain-English Meaning:</strong> Defining `a - b = 0` on `Nat` whenever `a &lt; b` so natural numbers stay closed without throwing runtime exceptions.</p>
+      <p><strong>Lean 4 Mechanism:</strong> <code>`(10 : Nat) - 12 = 0` (Ch 01).</code></p>
+    </article>
+    <article class="card card-elevated" data-filter-item data-cat="part-i">
+      <div class="prediction-header">
+        <span class="badge badge-accent">Part I</span>
+        <a href="../chapters/02.html">Earned in unit →</a>
+      </div>
+      <h3>Product Type (`structure`)</h3>
+      <p><strong>Plain-English Meaning:</strong> A record packing Field A AND Field B together; total state count multiplies (`|A| × |B|`).</p>
+      <p><strong>Lean 4 Mechanism:</strong> <code>`structure Config where ...` (Ch 02).</code></p>
+    </article>
+    <article class="card card-elevated" data-filter-item data-cat="part-i">
+      <div class="prediction-header">
+        <span class="badge badge-accent">Part I</span>
+        <a href="../chapters/02.html">Earned in unit →</a>
+      </div>
+      <h3>Sum Type (`inductive`)</h3>
+      <p><strong>Plain-English Meaning:</strong> A tagged choice representing Variant A OR Variant B (mutually exclusive); state count adds (`|A| + |B|`), making illegal combinations unrepresentable.</p>
+      <p><strong>Lean 4 Mechanism:</strong> <code>`inductive Session | anonymous | active (uid : Nat)` (Ch 02).</code></p>
+    </article>
+    <article class="card card-elevated" data-filter-item data-cat="part-i">
+      <div class="prediction-header">
+        <span class="badge badge-accent">Part I</span>
+        <a href="../chapters/03.html">Earned in unit →</a>
+      </div>
+      <h3>Boolean Reflection (`Decidable`)</h3>
+      <p><strong>Plain-English Meaning:</strong> Connecting an executable `Bool` check (0/1 data) to a rich mathematical specification `Prop` via `eval x = true ↔ Spec x`.</p>
+      <p><strong>Lean 4 Mechanism:</strong> <code>`Decidable P`, `decide`, `↔` (Ch 03).</code></p>
+    </article>
+    <article class="card card-elevated" data-filter-item data-cat="part-i">
+      <div class="prediction-header">
+        <span class="badge badge-accent">Part I</span>
+        <a href="../chapters/04.html">Earned in unit →</a>
+      </div>
+      <h3>Gear 1 (Bounded BFS Model Checking)</h3>
+      <p><strong>Plain-English Meaning:</strong> Exhaustively exploring all reachable action interleavings up to depth `k` to catch shallow protocol bugs and emit minimal counterexample traces.</p>
+      <p><strong>Lean 4 Mechanism:</strong> <code>35-line pure `bfs` in Lean + `#guard` (Ch 04).</code></p>
+    </article>
+    <article class="card card-elevated" data-filter-item data-cat="part-ii">
+      <div class="prediction-header">
+        <span class="badge badge-accent">Part II</span>
+        <a href="../chapters/05.html">Earned in unit →</a>
+      </div>
+      <h3>Lean Infoview</h3>
+      <p><strong>Plain-English Meaning:</strong> The live proof-state inspector showing **Objects** (variables), **Hypotheses** (assumptions in scope), and **⊢ Goal** (remaining obligation).</p>
+      <p><strong>Lean 4 Mechanism:</strong> <code>Interactive split-view in every chapter (Ch 05).</code></p>
+    </article>
+    <article class="card card-elevated" data-filter-item data-cat="part-ii">
+      <div class="prediction-header">
+        <span class="badge badge-accent">Part II</span>
+        <a href="../chapters/05.html">Earned in unit →</a>
+      </div>
+      <h3>Curry-Howard Correspondence</h3>
+      <p><strong>Plain-English Meaning:</strong> The exact identity between logical propositions and types: proving `P → Q` is writing a total function taking a proof of `P` to a proof of `Q`.</p>
+      <p><strong>Lean 4 Mechanism:</strong> <code>`theorem` bodies typechecked by Lean&#x27;s kernel (Ch 05).</code></p>
+    </article>
+    <article class="card card-elevated" data-filter-item data-cat="part-ii">
+      <div class="prediction-header">
+        <span class="badge badge-accent">Part II</span>
+        <a href="../chapters/08.html">Earned in unit →</a>
+      </div>
+      <h3>Garden-of-Eden State</h3>
+      <p><strong>Plain-English Meaning:</strong> An unreachable syntactic state `s` where `Safe s` happens to hold right now, yet one transition `Next s s&#x27;` crashes into an unsafe state `¬Safe s&#x27;`—breaking naive induction.</p>
+      <p><strong>Lean 4 Mechanism:</strong> <code>Eliminated by Inductive Strengthening (Ch 08 &amp; Lab 2).</code></p>
+    </article>
+    <article class="card card-elevated" data-filter-item data-cat="part-ii">
+      <div class="prediction-header">
+        <span class="badge badge-accent">Part II</span>
+        <a href="../chapters/08.html">Earned in unit →</a>
+      </div>
+      <h3>Gear 2 (Inductive Strengthening)</h3>
+      <p><strong>Plain-English Meaning:</strong> Adding structural invariants (`Inv s := Safe s ∧ Helper s`) so `Init s → Inv s` and `Inv s → Next s s&#x27; → Inv s&#x27;` hold across infinite depths and unbounded integers.</p>
+      <p><strong>Lean 4 Mechanism:</strong> <code>`Reachable s → Safe s` (Ch 08).</code></p>
+    </article>
+    <article class="card card-elevated" data-filter-item data-cat="part-iii">
+      <div class="prediction-header">
+        <span class="badge badge-accent">Part III</span>
+        <a href="../chapters/09.html">Earned in unit →</a>
+      </div>
+      <h3>Subtype &amp; Runtime Proof Erasure</h3>
+      <p><strong>Plain-English Meaning:</strong> Bundling a runtime value `x : α` with a compile-time proof `h : P x` (`{ x : α // P x }`). Lean erases `h` to zero bytes (`lcErased`) in machine code.</p>
+      <p><strong>Lean 4 Mechanism:</strong> <code>`Subtype`, `Fin cap`, `if h : ...` (Ch 09 &amp; Lab 4).</code></p>
+    </article>
+    <article class="card card-elevated" data-filter-item data-cat="part-iii">
+      <div class="prediction-header">
+        <span class="badge badge-accent">Part III</span>
+        <a href="../chapters/10.html">Earned in unit →</a>
+      </div>
+      <h3>Bit-Blasting &amp; LRAT (`bv_decide`)</h3>
+      <p><strong>Plain-English Meaning:</strong> Translating fixed-width 64-bit hardware arithmetic (`BitVec 64`) into SAT and checking an unsatisfiability certificate to catch `2^64` wrap-around bugs.</p>
+      <p><strong>Lean 4 Mechanism:</strong> <code>`import Std.Tactic.BVDecide`, `bv_decide` (Ch 10 &amp; Lab 5).</code></p>
+    </article>
+    <article class="card card-elevated" data-filter-item data-cat="part-iii">
+      <div class="prediction-header">
+        <span class="badge badge-accent">Part III</span>
+        <a href="../chapters/11.html">Earned in unit →</a>
+      </div>
+      <h3>Well-Founded Termination</h3>
+      <p><strong>Plain-English Meaning:</strong> Proving a measure (`buf.size - offset`) strictly decreases on every recursive call—turning termination proofs into compile-time Denial-of-Service protection.</p>
+      <p><strong>Lean 4 Mechanism:</strong> <code>`termination_by`, `decreasing_by`, `fun_induction` (Ch 11).</code></p>
+    </article>
+    <article class="card card-elevated" data-filter-item data-cat="part-iii">
+      <div class="prediction-header">
+        <span class="badge badge-accent">Part III</span>
+        <a href="../chapters/12.html">Earned in unit →</a>
+      </div>
+      <h3>Refinement Mapping &amp; Stuttering</h3>
+      <p><strong>Plain-English Meaning:</strong> An abstraction function `abs : Impl → Spec` proving optimized code implements a tiny spec; internal housekeeping steps (compaction, GC) satisfy `abs s&#x27; = abs s`.</p>
+      <p><strong>Lean 4 Mechanism:</strong> <code>`abs (compact s) = abs s` (Ch 12).</code></p>
+    </article>
+    <article class="card card-elevated" data-filter-item data-cat="part-iv">
+      <div class="prediction-header">
+        <span class="badge badge-accent">Part IV</span>
+        <a href="../chapters/13.html">Earned in unit →</a>
+      </div>
+      <h3>Trusted Computing Base (TCB)</h3>
+      <p><strong>Plain-English Meaning:</strong> The minimal set of components (`Spec.lean` + Lean kernel + audit gate) that must be honest for your verification guarantee to hold—excluding untrusted AI agents!</p>
+      <p><strong>Lean 4 Mechanism:</strong> <code>`#print axioms` &amp; `lake exe verigate` (Ch 13 &amp; Lab 3).</code></p>
+    </article>
+    <article class="card card-elevated" data-filter-item data-cat="part-iv">
+      <div class="prediction-header">
+        <span class="badge badge-accent">Part IV</span>
+        <a href="../chapters/14.html">Earned in unit →</a>
+      </div>
+      <h3>Non-Vacuity Witness</h3>
+      <p><strong>Plain-English Meaning:</strong> A companion theorem `∃ x, Pre x` proving your safety theorem&#x27;s preconditions are satisfiable by real inputs—blocking vacuous `False → Anything` cheats.</p>
+      <p><strong>Lean 4 Mechanism:</strong> <code>Enforced in `Spec.lean` &amp; `verigate` (Ch 13–14).</code></p>
+    </article>
+    <article class="card card-elevated" data-filter-item data-cat="part-iv">
+      <div class="prediction-header">
+        <span class="badge badge-accent">Part IV</span>
+        <a href="../chapters/15.html">Earned in unit →</a>
+      </div>
+      <h3>Stream-Safe Framing</h3>
+      <p><strong>Plain-English Meaning:</strong> Proving `decode (encode pkt ++ rest) = some (pkt, rest)` for all trailing bytes `rest`, ruling out TCP concatenation and frame-smuggling vulnerabilities.</p>
+      <p><strong>Lean 4 Mechanism:</strong> <code>TLV packet framing (Ch 15).</code></p>
+    </article>
+    <article class="card card-elevated" data-filter-item data-cat="part-iv">
+      <div class="prediction-header">
+        <span class="badge badge-accent">Part IV</span>
+        <a href="../chapters/16.html">Earned in unit →</a>
+      </div>
+      <h3>Differential Reference Oracle</h3>
+      <p><strong>Plain-English Meaning:</strong> Executing a mathematically verified Lean model (`lake exe oracle`) alongside a production Rust/Go/TS/Python service on thousands of adversarial traces.</p>
+      <p><strong>Lean 4 Mechanism:</strong> <code>`lake exe oracle` + `fuzz_against_oracle.py` (Ch 16).</code></p>
+    </article>
+  </div>
+</main>
+<div class="modal-backdrop" id="shortcut-modal" hidden role="dialog" aria-modal="true" aria-labelledby="shortcut-modal-title">
+  <div class="modal-dialog">
+    <div class="prediction-header">
+      <h3 id="shortcut-modal-title">Keyboard Shortcuts</h3>
+      <button type="button" class="btn btn-sm" data-action="close-shortcuts">Close (Esc)</button>
+    </div>
+    <div class="shortcut-row"><span>Step tactic forward in Infoview</span><kbd>j</kbd></div>
+    <div class="shortcut-row"><span>Step tactic backward in Infoview</span><kbd>k</kbd></div>
+    <div class="shortcut-row"><span>Previous unit / chapter</span><kbd>[</kbd></div>
+    <div class="shortcut-row"><span>Next unit / chapter</span><kbd>]</kbd></div>
+    <div class="shortcut-row"><span>Toggle Light / Dark theme</span><kbd>t</kbd></div>
+    <div class="shortcut-row"><span>Open or close this help dialog</span><kbd>?</kbd></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <strong>Indicogni LLC</strong> · <em>Prove It: Formally Verified Software in Lean 4</em><br>
+      Pinned to zero-dependency Core/<code>Std</code> Lean <code>v4.36.0</code>. Zero cookies, zero analytics, zero tracking.
+    </div>
+    <div>
+      Code: MIT · Prose &amp; SVG Diagrams: CC BY 4.0 · Feedback &amp; security: <code>feedback@indicogni.com</code><br>
+      <a href="https://github.com/indicogni/prove-it" target="_blank" rel="noopener noreferrer">github.com/indicogni/prove-it</a> ·
+      <a href="https://live.lean-lang.org/" target="_blank" rel="noopener noreferrer">live.lean-lang.org</a>
+    </div>
+  </div>
+</footer>
+  <script type="module" src="../assets/app.js"></script>
+  <script type="module" src="../assets/reference.js"></script>
+</body>
+</html>

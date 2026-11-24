@@ -1,0 +1,42 @@
+{
+  "name": "Prove It — Lean 4 Verification Environment",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "containerUser": "vscode",
+  "remoteUser": "vscode",
+  "updateRemoteUserUID": true,
+  "mounts": [],
+  "remoteEnv": {
+    "PATH": "${containerEnv:HOME}/.elan/bin:${containerEnv:PATH}",
+    "ELAN_HOME": "${containerEnv:HOME}/.elan"
+  },
+  "onCreateCommand": [
+    "/bin/bash",
+    "-c",
+    "set -euo pipefail; tmp_installer=\"$(mktemp)\"; trap 'rm -f \"$tmp_installer\"' EXIT; curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/leanprover/elan/3cc76985a1becb3c03cd65c1c5007e6f186ae474/elan-init.sh -o \"$tmp_installer\"; sh \"$tmp_installer\" -y --no-modify-path --default-toolchain leanprover/lean4:v4.36.0; \"$HOME/.elan/bin/elan\" --version; \"$HOME/.elan/bin/lean\" --version; \"$HOME/.elan/bin/lake\" build"
+  ],
+  "postCreateCommand": [
+    "/bin/bash",
+    "-c",
+    "set -euo pipefail; git config --local core.hooksPath .githooks || true"
+  ],
+  "forwardPorts": [8000],
+  "portsAttributes": {
+    "8000": {
+      "label": "Prove It Web Course (127.0.0.1)",
+      "onAutoForward": "notify"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "leanprover.lean4"
+      ],
+      "settings": {
+        "files.eol": "\n",
+        "files.trimTrailingWhitespace": true,
+        "telemetry.telemetryLevel": "off",
+        "lean4.toolchainPath": "${containerEnv:HOME}/.elan/toolchains/leanprover--lean4---v4.36.0"
+      }
+    }
+  }
+}

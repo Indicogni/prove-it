@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';">
+  <meta name="referrer" content="no-referrer">
+  <title>Ch 16: Monday-Morning Transfer (`lake exe oracle`) — Prove It (Indicogni)</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-unit-id="16" data-unit-title="Ch 16: Monday-Morning Transfer (`lake exe oracle`)" data-prev-href="15.html" data-next-href="cp4.html">
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand-link" href="../index.html">
+      <span class="brand-org">indicogni</span>
+      <span class="brand-sep">/</span>
+      <span class="brand-title">Prove It</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="../index.html#curriculum" aria-current="page">Curriculum</a>
+      <a class="nav-link" href="../labs/index.html">6 Live Labs</a>
+      <a class="nav-link" href="../capstones/index.html">4 Capstones</a>
+      <a class="nav-link" href="../reference/tla-to-lean.html">TLA+ ↔ Lean</a>
+      <a class="nav-link" href="../reference/ai-playbook.html">AI Playbook</a>
+      <a class="nav-link" href="../reference/glossary.html">Glossary</a>
+    </nav>
+    <div class="nav-controls">
+      <span class="progress-pill" data-progress-summary>0/20 units · 0/6 labs</span>
+      <button type="button" class="icon-btn" data-action="open-shortcuts" title="Keyboard shortcuts (?)">Shortcuts (?)</button>
+      <button type="button" class="icon-btn" data-action="toggle-theme">Dark theme (t)</button>
+    </div>
+  </div>
+</header>
+<main class="chapter-shell">
+  <div class="chapter-header">
+    <div class="chapter-topbar">
+      <span class="badge badge-accent">Part IV · AI-Native Verification &amp; Transfer</span>
+      <span class="badge">Ch 16 · 30 min · <code>ProveIt/Ch16.lean</code></span>
+    </div>
+    <h1>Monday-Morning Transfer (`lake exe oracle`)</h1>
+    <p class="hero-subtitle">Using Lean 4 as a Reference Differential Oracle for Rust, Go, TypeScript, Python, and C++ services.</p>
+
+    <div class="puzzle-box">
+      <span class="puzzle-title">5-Line Adoption Question · &#x27;My Team Ships Rust/Go/TS, Not Lean!&#x27;</span>
+      <pre><code>-- AWS S3 ShardStore, AWS Cedar, and Cloudflare didn&#x27;t rewrite 10M lines of Rust/Go in Lean.
+-- Instead: 300 lines of Lean 4 = Verified Executable Reference Oracle (`lake exe oracle`).
+-- CI pipes 50,000 adversarial traces into BOTH Production Rust/Go AND `lake exe oracle`.
+-- Any 1-bit divergence between Production and Verified Lean fails the PR immediately!</code></pre>
+    </div>
+
+    <section class="prediction-card" id="prediction-card" aria-labelledby="pred-heading">
+      <div class="prediction-header">
+        <strong id="pred-heading">Socratic Gate · Commit to a Prediction</strong>
+        <span class="badge badge-open" data-prediction-status>Unanswered · Locks on commit</span>
+      </div>
+      <p>Why does differential-fuzzing a Rust/Go/TypeScript service against a verified Lean 4 executable oracle (`lake exe oracle`) catch bugs that ordinary self-contained property tests in Rust/Go miss?</p>
+      <div class="prediction-options" data-prediction-options></div>
+      <button type="button" class="btn btn-primary btn-sm" data-action="lock-prediction" disabled>Lock Prediction &amp; Reveal Mechanism</button>
+      <div class="prediction-reveal" data-prediction-reveal hidden>
+        <strong>Why this happens:</strong>
+        <p data-prediction-explanation></p>
+      </div>
+    </section>
+  </div>
+
+  <article class="container-prose">
+    <h2>Three Monday-Morning Adoption Rungs</h2>
+    <p><strong>Rung 1 (Zero Lean in Prod — Design &amp; Typestate Habits)</strong>: Apply sum-type domain modeling (Ch 02), explicit overflow/saturating awareness (Ch 01 &amp; Ch 10), and Gear 1 state-table thinking to your everyday Rust enums, TypeScript discriminated unions, and Go structs.</p>
+    <p><strong>Rung 2 (Verified Reference Oracle in CI — Highest ROI)</strong>: Model your gnarliest 300-line core (authorization, billing, lease fencing, rate limiting, wire framing) in Lean 4, prove its invariants, and differential-fuzz your production service against <code>lake exe oracle</code> via <code>scripts/fuzz_against_oracle.py</code>.</p>
+    <p><strong>Rung 3 (Direct C FFI / Proof-Carrying AI Gate)</strong>: Compile hot pure cores to C via Lean&#x27;s compiler or enforce <code>lake exe verigate</code> on AI-synthesized modules.</p>
+
+  </article>
+
+  <section class="workbench" id="chapter-workbench" aria-label="Interactive Lean 4 Infoview Stepper">
+    <div class="workbench-toolbar">
+      <div class="workbench-title">
+        <span>⊢</span>
+        <span>ProveIt/Ch16.lean · Executable Trace Oracle State Machine</span>
+      </div>
+      <div class="stepper-controls">
+        <button type="button" class="btn btn-sm" data-action="step-reset">⏮ Reset</button>
+        <button type="button" class="btn btn-sm" data-action="step-prev">← Prev (k)</button>
+        <span class="step-counter" data-step-counter>Step 1 / 1</span>
+        <button type="button" class="btn btn-sm btn-primary" data-action="step-next">Next (j) →</button>
+      </div>
+    </div>
+
+    <div class="workbench-split">
+      <div class="code-pane" aria-label="Lean 4 source code">
+        <div class="code-lines" data-code-lines></div>
+      </div>
+      <div class="infoview-pane" aria-live="polite" aria-label="Simulated Lean 4 Infoview">
+        <div class="infoview-header">
+          <span class="infoview-title">Lean Infoview</span>
+          <span class="badge badge-open" data-goal-badge>Open Goal</span>
+        </div>
+        <div>
+          <span class="infoview-section-label">Objects</span>
+          <div class="infoview-block" data-infoview-objects></div>
+        </div>
+        <div>
+          <span class="infoview-section-label">Hypotheses</span>
+          <div class="infoview-block" data-infoview-hyps></div>
+        </div>
+        <div>
+          <span class="infoview-section-label">⊢ Current Goal</span>
+          <div class="infoview-block infoview-goal" data-infoview-goal></div>
+        </div>
+        <div class="infoview-note" data-infoview-note></div>
+      </div>
+    </div>
+
+    <div class="workbench-footer">
+      <div class="action-group">
+        <a class="btn btn-primary btn-sm" data-playground-link href="https://live.lean-lang.org/#code=--%20Chapter%2016%3A%20Monday-Morning%20Transfer%20%E2%80%94%20Verified%20Differential%20Oracle%0Ainductive%20Cmd%20%7C%20deposit%20%28amt%20%3A%20Nat%29%20%7C%20withdraw%20%28amt%20%3A%20Nat%29%20%7C%20freeze%20deriving%20Repr%0A%0Astructure%20AccountOracle%20where%0A%20%20balance%20%3A%20Nat%0A%20%20frozen%20%20%3A%20Bool%0A%20%20deriving%20Repr%2C%20DecidableEq%0A%0Adef%20stepOracle%20%28s%20%3A%20AccountOracle%29%20%28c%20%3A%20Cmd%29%20%3A%20AccountOracle%20%3A%3D%0A%20%20if%20s.frozen%20then%20s%0A%20%20else%20match%20c%20with%0A%20%20%20%20%7C%20.deposit%20amt%20%20%3D%3E%20%7B%20s%20with%20balance%20%3A%3D%20s.balance%20%2B%20amt%20%7D%0A%20%20%20%20%7C%20.withdraw%20amt%20%3D%3E%20if%20amt%20%E2%89%A4%20s.balance%20then%20%7B%20s%20with%20balance%20%3A%3D%20s.balance%20-%20amt%20%7D%20else%20s%0A%20%20%20%20%7C%20.freeze%20%20%20%20%20%20%20%3D%3E%20%7B%20s%20with%20frozen%20%3A%3D%20true%20%7D%0A%0Adef%20runTrace%20%28s%20%3A%20AccountOracle%29%20%28cmds%20%3A%20List%20Cmd%29%20%3A%20AccountOracle%20%3A%3D%0A%20%20cmds.foldl%20stepOracle%20s%0A%0Atheorem%20frozen_locks_balance%20%28s%20%3A%20AccountOracle%29%20%28cmds%20%3A%20List%20Cmd%29%20%28h%20%3A%20s.frozen%20%3D%20true%29%20%3A%0A%20%20%20%20%28runTrace%20s%20cmds%29.balance%20%3D%20s.balance%20%3A%3D%20by%0A%20%20induction%20cmds%20generalizing%20s%20with%0A%20%20%7C%20nil%20%3D%3E%20rfl%0A%20%20%7C%20cons%20c%20rest%20ih%20%3D%3E%0A%20%20%20%20simp%20only%20%5BrunTrace%2C%20List.foldl_cons%2C%20stepOracle%2C%20h%2C%20%E2%86%93reduceIte%5D%0A%20%20%20%20exact%20ih%20s%20h%0A" target="_blank" rel="noopener noreferrer">Run in Lean 4 Playground ↗</a>
+        <button type="button" class="btn btn-sm" data-action="copy-lean">Copy Lean snippet</button>
+      </div>
+      <div class="action-group">
+        <button type="button" class="btn btn-sm" data-copy-text="lake exe check ch16">Copy local command: <code>lake exe check ch16</code></button>
+      </div>
+    </div>
+  </section>
+
+  <div class="container-prose">
+    <div class="callout callout-verified">
+      <strong>Hands-On Exercise (ProveIt/Ch16.lean):</strong>
+      <p>Run `lake exe oracle --demo` and `python3 scripts/fuzz_against_oracle.py` locally, then finish `ProveIt/Ch16.lean`!</p>
+    </div>
+
+    <div class="chapter-complete-bar">
+      <div>
+        <strong>Finished the Socratic gate, Infoview trace, and playground run?</strong><br>
+        <span>Record completion in local browser storage to track your 20-unit progress.</span>
+      </div>
+      <button type="button" class="btn btn-verified" data-action="toggle-complete">Mark chapter complete</button>
+    </div>
+
+    <nav class="chapter-pager" aria-label="Chapter pagination">
+      <a class="pager-card" href="15.html"><span class="pager-dir">← Previous ([) · Ch 15</span><span class="pager-title">Verified Wire Formats (TLV Framing)</span></a>
+      <a class="pager-card align-right" href="cp4.html"><span class="pager-dir">Next (]) · CP 4 →</span><span class="pager-title">Checkpoint 4: Red-Team Audit of an AI Batch Escrow</span></a>
+    </nav>
+  </div>
+</main>
+<div class="modal-backdrop" id="shortcut-modal" hidden role="dialog" aria-modal="true" aria-labelledby="shortcut-modal-title">
+  <div class="modal-dialog">
+    <div class="prediction-header">
+      <h3 id="shortcut-modal-title">Keyboard Shortcuts</h3>
+      <button type="button" class="btn btn-sm" data-action="close-shortcuts">Close (Esc)</button>
+    </div>
+    <div class="shortcut-row"><span>Step tactic forward in Infoview</span><kbd>j</kbd></div>
+    <div class="shortcut-row"><span>Step tactic backward in Infoview</span><kbd>k</kbd></div>
+    <div class="shortcut-row"><span>Previous unit / chapter</span><kbd>[</kbd></div>
+    <div class="shortcut-row"><span>Next unit / chapter</span><kbd>]</kbd></div>
+    <div class="shortcut-row"><span>Toggle Light / Dark theme</span><kbd>t</kbd></div>
+    <div class="shortcut-row"><span>Open or close this help dialog</span><kbd>?</kbd></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <strong>Indicogni LLC</strong> · <em>Prove It: Formally Verified Software in Lean 4</em><br>
+      Pinned to zero-dependency Core/<code>Std</code> Lean <code>v4.36.0</code>. Zero cookies, zero analytics, zero tracking.
+    </div>
+    <div>
+      Code: MIT · Prose &amp; SVG Diagrams: CC BY 4.0 · Feedback &amp; security: <code>feedback@indicogni.com</code><br>
+      <a href="https://github.com/indicogni/prove-it" target="_blank" rel="noopener noreferrer">github.com/indicogni/prove-it</a> ·
+      <a href="https://live.lean-lang.org/" target="_blank" rel="noopener noreferrer">live.lean-lang.org</a>
+    </div>
+  </div>
+</footer>
+  <script type="module" src="../assets/app.js"></script>
+</body>
+</html>

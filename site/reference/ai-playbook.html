@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';">
+  <meta name="referrer" content="no-referrer">
+  <title>AI Vericoding Playbook &amp; Polyglot Oracle Guide — Prove It (Indicogni)</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand-link" href="../index.html">
+      <span class="brand-org">indicogni</span>
+      <span class="brand-sep">/</span>
+      <span class="brand-title">Prove It</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="../index.html#curriculum">Curriculum</a>
+      <a class="nav-link" href="../labs/index.html">6 Live Labs</a>
+      <a class="nav-link" href="../capstones/index.html">4 Capstones</a>
+      <a class="nav-link" href="../reference/tla-to-lean.html">TLA+ ↔ Lean</a>
+      <a class="nav-link" href="../reference/ai-playbook.html" aria-current="page">AI Playbook</a>
+      <a class="nav-link" href="../reference/glossary.html">Glossary</a>
+    </nav>
+    <div class="nav-controls">
+      <span class="progress-pill" data-progress-summary>0/20 units · 0/6 labs</span>
+      <button type="button" class="icon-btn" data-action="open-shortcuts" title="Keyboard shortcuts (?)">Shortcuts (?)</button>
+      <button type="button" class="icon-btn" data-action="toggle-theme">Dark theme (t)</button>
+    </div>
+  </div>
+</header>
+<main class="container-wide">
+  <span class="eyebrow">Chapters 13, 14 &amp; 16 Field Guide</span>
+  <h1>AI Vericoding Playbook &amp; Polyglot <code>oracle</code> Guide</h1>
+  <p class="hero-subtitle">
+    Copy-paste prompts for supervising untrusted coding agents, CI configuration for <code>lake exe verigate</code>, and differential-fuzzing harnesses connecting Lean 4 to Rust, Go, TypeScript, and Python services.
+  </p>
+
+  <section class="lab-card">
+    <div class="prediction-header">
+      <h2>1. Copyable Spec-First Agent Prompts</h2>
+      <span class="badge badge-accent">Human Owns Spec · Agent Owns Impl</span>
+    </div>
+
+    <h3>Prompt A — Co-Designing <code>Spec.lean</code> (Before Any Implementation)</h3>
+    <pre><code id="prompt-spec">You are assisting with a Lean 4.36.0 Spec-First module (zero external dependencies, Core/Std only).
+1. Do NOT write implementation optimizations yet.
+2. Propose `Spec.lean` containing algebraic domain types (no boolean soup), a tiny total reference function,
+   BOTH a Soundness theorem and a Completeness theorem (blocking trivial always-none implementations),
+   and an explicit Non-Vacuity witness `theorem pre_satisfiable : ∃ x, Pre x`.
+3. List 3 concrete `#guard` sanity examples we should review together before locking `Spec.lean`.</code></pre>
+    <button type="button" class="btn btn-sm" data-copy-target="prompt-spec">Copy Spec Architect Prompt</button>
+
+    <h3>Prompt B — Locked-Spec Implementation &amp; Proof Synthesis</h3>
+    <pre><code id="prompt-prover">`Spec.lean` is SHA-256 locked—do NOT modify any declaration or theorem signature in `Spec.lean`.
+Edit ONLY `Impl.lean` to implement the optimized algorithm and prove all required theorems.
+Hard CI constraints enforced by `lake exe verigate`:
+- Zero `sorry`, zero custom `axiom` or `opaque`, zero `unsafe` or `partial`.
+- Zero `@[implemented_by]`, `@[extern]`, `@[csimp]`, or raw `native_decide`.
+- Prefer `fun_cases`, surgical `simp only [...]`, `omega`, `grind`, and `bv_decide` (when Tier 1 is enabled).</code></pre>
+    <button type="button" class="btn btn-sm" data-copy-target="prompt-prover">Copy Locked-Spec Prover Prompt</button>
+
+    <h3>Prompt C — Stuck Infoview 3-Way Triage</h3>
+    <pre><code id="prompt-triage">My Lean 4.36.0 proof is stuck at this exact Infoview state:
+[PASTE OBJECTS / HYPOTHESES / ⊢ GOAL HERE]
+
+Before suggesting ANY tactics, run the 3-Way Triage:
+(A) Is the leaf goal actually FALSE for concrete small values? If so, give a `#guard` counterexample.
+(B) Did the theorem statement omit a real domain precondition?
+(C) Is this a true property failing on an unreachable Garden-of-Eden state that needs inductive strengthening?</code></pre>
+    <button type="button" class="btn btn-sm" data-copy-target="prompt-triage">Copy Stuck-Goal Triage Prompt</button>
+  </section>
+
+  <section class="lab-card">
+    <h2>2. Two-Tier Axiom Policy &amp; <code>VeriGate</code> GitHub Actions Setup</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Mechanism / Declaration</th>
+            <th>Tier 0 (<code>--strict-kernel</code>)</th>
+            <th>Tier 1 (<code>--trust-tier=bv-lrat</code>)</th>
+            <th>Security Rationale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>propext</code>, <code>Quot.sound</code>, <code>Classical.choice</code></td>
+            <td><span class="badge badge-verified">Allowed</span></td>
+            <td><span class="badge badge-verified">Allowed</span></td>
+            <td>Standard mathematical foundation of Lean 4's small kernel.</td>
+          </tr>
+          <tr>
+            <td><code>bv_decide</code> (LRAT hardware bit-blasting)</td>
+            <td><span class="badge badge-refuted">Rejected</span></td>
+            <td><span class="badge badge-verified">Allowed (audited)</span></td>
+            <td>Permits verified LRAT bit-vector certificates when zero raw <code>native_decide</code> exists.</td>
+          </tr>
+          <tr>
+            <td>Raw <code>native_decide</code></td>
+            <td><span class="badge badge-refuted">Rejected</span></td>
+            <td><span class="badge badge-refuted">Rejected</span></td>
+            <td>Pulls unverified native code generation into the proof TCB.</td>
+          </tr>
+          <tr>
+            <td><code>sorryAx</code>, custom <code>axiom</code> / <code>opaque</code></td>
+            <td><span class="badge badge-refuted">Rejected</span></td>
+            <td><span class="badge badge-refuted">Rejected</span></td>
+            <td>Prevents unfinished holes and arbitrary unproven assumptions.</td>
+          </tr>
+          <tr>
+            <td><code>@[implemented_by]</code>, <code>@[extern]</code>, <code>@[csimp]</code></td>
+            <td><span class="badge badge-refuted">Rejected</span></td>
+            <td><span class="badge badge-refuted">Rejected</span></td>
+            <td>Blocks silent swaps between verified kernel models and unverified runtime binaries.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Minimal GitHub Actions Workflow</h3>
+    <pre><code id="ci-yaml">name: VeriGate &amp; Differential Oracle CI
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leanprover/lean-action@v1
+      - name: Enforce VeriGate TCB Audit
+        run: lake exe verigate --strict-kernel
+      - name: Differential-Fuzz Service Against Verified Lean Oracle
+        run: python3 scripts/fuzz_against_oracle.py</code></pre>
+    <button type="button" class="btn btn-sm" data-copy-target="ci-yaml">Copy GitHub Actions YAML</button>
+  </section>
+
+  <section class="lab-card">
+    <h2>3. Polyglot Differential Fuzzing with <code>lake exe oracle</code></h2>
+    <p>
+      Your production service can stay 100% Rust, Go, TypeScript, Python, or C++. Expose a thin CLI or test endpoint accepting JSONL action traces, and compare every state transition output against <code>lake exe oracle</code>:
+    </p>
+    <pre><code id="polyglot-py"># Differential fuzzing any Rust / Go / TypeScript / Python binary against `lake exe oracle`
+import json, subprocess
+
+def query_jsonl(cmd: list[str], trace: list[dict]) -&gt; dict:
+    proc = subprocess.run(cmd, input=json.dumps({&#x27;trace&#x27;: trace}) + &#x27;\n&#x27;,
+                          text=True, capture_output=True, check=True)
+    return json.loads(proc.stdout)
+
+lean_truth = query_jsonl([&#x27;lake&#x27;, &#x27;exe&#x27;, &#x27;oracle&#x27;, &#x27;--jsonl&#x27;], adversarial_trace)
+prod_actual = query_jsonl([&#x27;./target/release/my-rust-service&#x27;, &#x27;--jsonl&#x27;], adversarial_trace)
+assert prod_actual == lean_truth, f&#x27;Divergence vs verified Lean spec: {prod_actual} != {lean_truth}&#x27;</code></pre>
+    <div class="action-group">
+      <button type="button" class="btn btn-sm" data-copy-target="polyglot-py">Copy Differential Harness Template</button>
+      <button type="button" class="btn btn-sm" data-copy-text="python3 scripts/fuzz_against_oracle.py">Copy local fuzzer command</button>
+    </div>
+    <div class="grid-2">
+      <div class="callout">
+        <strong>Rust &amp; Go Services:</strong>
+        <p>Feed <code>proptest</code> / <code>go test -fuzz</code> byte seeds into both your struct state machine and a long-lived <code>lake exe oracle --stdio</code> child process over newline-delimited JSON.</p>
+      </div>
+      <div class="callout">
+        <strong>TypeScript &amp; Python Services:</strong>
+        <p>Generate 1,000 golden edge-case JSON vectors from your verified Lean spec (<code>lake exe oracle --dump-vectors &gt; vectors.json</code>) and assert 100% parity in Vitest / Pytest in under 200ms.</p>
+      </div>
+    </div>
+  </section>
+</main>
+<div class="modal-backdrop" id="shortcut-modal" hidden role="dialog" aria-modal="true" aria-labelledby="shortcut-modal-title">
+  <div class="modal-dialog">
+    <div class="prediction-header">
+      <h3 id="shortcut-modal-title">Keyboard Shortcuts</h3>
+      <button type="button" class="btn btn-sm" data-action="close-shortcuts">Close (Esc)</button>
+    </div>
+    <div class="shortcut-row"><span>Step tactic forward in Infoview</span><kbd>j</kbd></div>
+    <div class="shortcut-row"><span>Step tactic backward in Infoview</span><kbd>k</kbd></div>
+    <div class="shortcut-row"><span>Previous unit / chapter</span><kbd>[</kbd></div>
+    <div class="shortcut-row"><span>Next unit / chapter</span><kbd>]</kbd></div>
+    <div class="shortcut-row"><span>Toggle Light / Dark theme</span><kbd>t</kbd></div>
+    <div class="shortcut-row"><span>Open or close this help dialog</span><kbd>?</kbd></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <strong>Indicogni LLC</strong> · <em>Prove It: Formally Verified Software in Lean 4</em><br>
+      Pinned to zero-dependency Core/<code>Std</code> Lean <code>v4.36.0</code>. Zero cookies, zero analytics, zero tracking.
+    </div>
+    <div>
+      Code: MIT · Prose &amp; SVG Diagrams: CC BY 4.0 · Feedback &amp; security: <code>feedback@indicogni.com</code><br>
+      <a href="https://github.com/indicogni/prove-it" target="_blank" rel="noopener noreferrer">github.com/indicogni/prove-it</a> ·
+      <a href="https://live.lean-lang.org/" target="_blank" rel="noopener noreferrer">live.lean-lang.org</a>
+    </div>
+  </div>
+</footer>
+  <script type="module" src="../assets/app.js"></script>
+  <script type="module" src="../assets/reference.js"></script>
+</body>
+</html>

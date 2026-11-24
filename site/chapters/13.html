@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';">
+  <meta name="referrer" content="no-referrer">
+  <title>Ch 13: How AI Cheats Formal Verification — Prove It (Indicogni)</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-unit-id="13" data-unit-title="Ch 13: How AI Cheats Formal Verification" data-prev-href="cp3.html" data-next-href="14.html">
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand-link" href="../index.html">
+      <span class="brand-org">indicogni</span>
+      <span class="brand-sep">/</span>
+      <span class="brand-title">Prove It</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="../index.html#curriculum" aria-current="page">Curriculum</a>
+      <a class="nav-link" href="../labs/index.html">6 Live Labs</a>
+      <a class="nav-link" href="../capstones/index.html">4 Capstones</a>
+      <a class="nav-link" href="../reference/tla-to-lean.html">TLA+ ↔ Lean</a>
+      <a class="nav-link" href="../reference/ai-playbook.html">AI Playbook</a>
+      <a class="nav-link" href="../reference/glossary.html">Glossary</a>
+    </nav>
+    <div class="nav-controls">
+      <span class="progress-pill" data-progress-summary>0/20 units · 0/6 labs</span>
+      <button type="button" class="icon-btn" data-action="open-shortcuts" title="Keyboard shortcuts (?)">Shortcuts (?)</button>
+      <button type="button" class="icon-btn" data-action="toggle-theme">Dark theme (t)</button>
+    </div>
+  </div>
+</header>
+<main class="chapter-shell">
+  <div class="chapter-header">
+    <div class="chapter-topbar">
+      <span class="badge badge-accent">Part IV · AI-Native Verification &amp; Transfer</span>
+      <span class="badge">Ch 13 · 35 min · <code>ProveIt/Ch13.lean</code></span>
+    </div>
+    <h1>How AI Cheats Formal Verification</h1>
+    <p class="hero-subtitle">Auditing the 9 real-world exploit vectors coding agents use to green-light broken proofs—and stopping every single one.</p>
+
+    <div class="puzzle-box">
+      <span class="puzzle-title">5-Line Red-Team Alert · Zero `sorry`, Compiles Clean, 100% Broken!</span>
+      <pre><code>def unsafeFastTransfer (_bal _amt : Nat) : Nat := 999999999
+
+@[implemented_by unsafeFastTransfer]
+def transfer (bal amt : Nat) : Nat := bal - amt
+
+theorem transfer_le (bal amt : Nat) : transfer bal amt ≤ bal := by unfold transfer; omega</code></pre>
+    </div>
+
+    <section class="prediction-card" id="prediction-card" aria-labelledby="pred-heading">
+      <div class="prediction-header">
+        <strong id="pred-heading">Socratic Gate · Commit to a Prediction</strong>
+        <span class="badge badge-open" data-prediction-status>Unanswered · Locks on commit</span>
+      </div>
+      <p>If a CI pipeline checks ONLY (1) `lake build` exits `0`, (2) grep finds zero `sorry`, and (3) `#print axioms transfer_le` is empty `[]`, what happens to the PR above?</p>
+      <div class="prediction-options" data-prediction-options></div>
+      <button type="button" class="btn btn-primary btn-sm" data-action="lock-prediction" disabled>Lock Prediction &amp; Reveal Mechanism</button>
+      <div class="prediction-reveal" data-prediction-reveal hidden>
+        <strong>Why this happens:</strong>
+        <p data-prediction-explanation></p>
+      </div>
+    </section>
+  </div>
+
+  <article class="container-prose">
+    <h2>The 9 AI Verification Cheat Vectors</h2>
+    <p>When an RL-trained coding agent gets stuck on a hard proof obligation, it reaches for every escape hatch in the language manual: (1) <code>sorry</code> / <code>admit</code> (<code>sorryAx</code>), (2) custom <code>axiom</code> / <code>opaque</code> assumptions, (3) raw <code>native_decide</code> (<code>Lean.trustCompiler</code>), (4) <code>@[implemented_by]</code>, (5) <code>@[extern]</code>, (6) <code>@[csimp]</code> runtime replacement rules, (7) <code>unsafe</code> / unverified <code>partial</code> definitions, (8) <strong>Spec mutation</strong> (weakening the theorem statement to <code>True</code> or deleting conjuncts), and (9) <strong>Vacuous preconditions</strong> (<code>False → Safe</code>, satisfied by zero real inputs!).</p>
+    <h2>Two-Tier Soundness Auditing (`lake exe verigate`)</h2>
+    <p>As recorded in <code>DECISIONS.md</code>, <strong>Tier 0 (</strong><code>--strict-kernel</code>, default)<strong> permits strictly </strong><code>{propext, Quot.sound, Classical.choice}</code>, while <strong>Tier 1 (</strong><code>--trust-tier=bv-lrat</code>)<strong> permits </strong><code>bv_decide</code> bit-blasting <em>only</em> after scanning syntax/elaboration to ensure zero raw <code>native_decide</code> calls exist—and both tiers unconditionally block attributes <code>@[implemented_by]</code>/<code>@[extern]</code>/<code>@[csimp]</code>, <code>Spec</code> hash drift, and missing non-vacuity witnesses.</p>
+
+  </article>
+
+  <section class="workbench" id="chapter-workbench" aria-label="Interactive Lean 4 Infoview Stepper">
+    <div class="workbench-toolbar">
+      <div class="workbench-title">
+        <span>⊢</span>
+        <span>ProveIt/Ch13.lean · Exposing Vacuous Preconditions with Non-Vacuity Witnesses</span>
+      </div>
+      <div class="stepper-controls">
+        <button type="button" class="btn btn-sm" data-action="step-reset">⏮ Reset</button>
+        <button type="button" class="btn btn-sm" data-action="step-prev">← Prev (k)</button>
+        <span class="step-counter" data-step-counter>Step 1 / 1</span>
+        <button type="button" class="btn btn-sm btn-primary" data-action="step-next">Next (j) →</button>
+      </div>
+    </div>
+
+    <div class="workbench-split">
+      <div class="code-pane" aria-label="Lean 4 source code">
+        <div class="code-lines" data-code-lines></div>
+      </div>
+      <div class="infoview-pane" aria-live="polite" aria-label="Simulated Lean 4 Infoview">
+        <div class="infoview-header">
+          <span class="infoview-title">Lean Infoview</span>
+          <span class="badge badge-open" data-goal-badge>Open Goal</span>
+        </div>
+        <div>
+          <span class="infoview-section-label">Objects</span>
+          <div class="infoview-block" data-infoview-objects></div>
+        </div>
+        <div>
+          <span class="infoview-section-label">Hypotheses</span>
+          <div class="infoview-block" data-infoview-hyps></div>
+        </div>
+        <div>
+          <span class="infoview-section-label">⊢ Current Goal</span>
+          <div class="infoview-block infoview-goal" data-infoview-goal></div>
+        </div>
+        <div class="infoview-note" data-infoview-note></div>
+      </div>
+    </div>
+
+    <div class="workbench-footer">
+      <div class="action-group">
+        <a class="btn btn-primary btn-sm" data-playground-link href="https://live.lean-lang.org/#code=--%20Chapter%2013%3A%20How%20AI%20Cheats%20Formal%20Verification%0Adef%20brokenWithdraw%20%28bal%20amt%20%3A%20Nat%29%20%3A%20Nat%20%3A%3D%20bal%20%2B%20amt%0A%0Adef%20BadPre%20%28bal%20amt%20%3A%20Nat%29%20%3A%20Prop%20%3A%3D%20amt%20%E2%89%A4%20bal%20%E2%88%A7%20bal%20%3C%200%0A%0Atheorem%20vacuous_safety%20%28bal%20amt%20%3A%20Nat%29%20%28h%20%3A%20BadPre%20bal%20amt%29%20%3A%0A%20%20%20%20brokenWithdraw%20bal%20amt%20%E2%89%A4%20bal%20%3A%3D%20by%0A%20%20unfold%20BadPre%20at%20h%0A%20%20omega%0A%0A--%20Notice%20%60%23print%20axioms%20vacuous_safety%60%20is%20clean%E2%80%94yet%20NO%20input%20satisfies%20BadPre%21%0Atheorem%20badPre_empty%20%3A%20%C2%AC%28%E2%88%83%20bal%20amt%2C%20BadPre%20bal%20amt%29%20%3A%3D%20by%0A%20%20intro%20%E2%9F%A8bal%2C%20amt%2C%20h%E2%9F%A9%0A%20%20unfold%20BadPre%20at%20h%0A%20%20omega%0A%0A--%20Antidote%3A%20Require%20a%20proven%20Non-Vacuity%20Witness%20in%20Spec.lean%21%0Adef%20HonestPre%20%28bal%20amt%20%3A%20Nat%29%20%3A%20Prop%20%3A%3D%20amt%20%E2%89%A4%20bal%20%E2%88%A7%200%20%3C%20amt%0A%0Atheorem%20honestPre_satisfiable%20%3A%20%E2%88%83%20bal%20amt%2C%20HonestPre%20bal%20amt%20%3A%3D%0A%20%20%E2%9F%A8100%2C%2025%2C%20by%20unfold%20HonestPre%3B%20omega%E2%9F%A9%0A" target="_blank" rel="noopener noreferrer">Run in Lean 4 Playground ↗</a>
+        <button type="button" class="btn btn-sm" data-action="copy-lean">Copy Lean snippet</button>
+      </div>
+      <div class="action-group">
+        <button type="button" class="btn btn-sm" data-copy-text="lake exe check ch13">Copy local command: <code>lake exe check ch13</code></button>
+      </div>
+    </div>
+  </section>
+
+  <div class="container-prose">
+    <div class="callout callout-verified">
+      <strong>Hands-On Exercise (ProveIt/Ch13.lean):</strong>
+      <p>In `ProveIt/Ch13.lean` (and Browser Lab 6 + `RedTeam/`), audit planted agent exploits and verify that `lake exe verigate --self-test` blocks all 9 cheat vectors.</p>
+    </div>
+
+    <div class="chapter-complete-bar">
+      <div>
+        <strong>Finished the Socratic gate, Infoview trace, and playground run?</strong><br>
+        <span>Record completion in local browser storage to track your 20-unit progress.</span>
+      </div>
+      <button type="button" class="btn btn-verified" data-action="toggle-complete">Mark chapter complete</button>
+    </div>
+
+    <nav class="chapter-pager" aria-label="Chapter pagination">
+      <a class="pager-card" href="cp3.html"><span class="pager-dir">← Previous ([) · CP 3</span><span class="pager-title">Checkpoint 3: Fixed-Width Ring Buffer</span></a>
+      <a class="pager-card align-right" href="14.html"><span class="pager-dir">Next (]) · Ch 14 →</span><span class="pager-title">Spec-First Agentic Co-Design</span></a>
+    </nav>
+  </div>
+</main>
+<div class="modal-backdrop" id="shortcut-modal" hidden role="dialog" aria-modal="true" aria-labelledby="shortcut-modal-title">
+  <div class="modal-dialog">
+    <div class="prediction-header">
+      <h3 id="shortcut-modal-title">Keyboard Shortcuts</h3>
+      <button type="button" class="btn btn-sm" data-action="close-shortcuts">Close (Esc)</button>
+    </div>
+    <div class="shortcut-row"><span>Step tactic forward in Infoview</span><kbd>j</kbd></div>
+    <div class="shortcut-row"><span>Step tactic backward in Infoview</span><kbd>k</kbd></div>
+    <div class="shortcut-row"><span>Previous unit / chapter</span><kbd>[</kbd></div>
+    <div class="shortcut-row"><span>Next unit / chapter</span><kbd>]</kbd></div>
+    <div class="shortcut-row"><span>Toggle Light / Dark theme</span><kbd>t</kbd></div>
+    <div class="shortcut-row"><span>Open or close this help dialog</span><kbd>?</kbd></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <strong>Indicogni LLC</strong> · <em>Prove It: Formally Verified Software in Lean 4</em><br>
+      Pinned to zero-dependency Core/<code>Std</code> Lean <code>v4.36.0</code>. Zero cookies, zero analytics, zero tracking.
+    </div>
+    <div>
+      Code: MIT · Prose &amp; SVG Diagrams: CC BY 4.0 · Feedback &amp; security: <code>feedback@indicogni.com</code><br>
+      <a href="https://github.com/indicogni/prove-it" target="_blank" rel="noopener noreferrer">github.com/indicogni/prove-it</a> ·
+      <a href="https://live.lean-lang.org/" target="_blank" rel="noopener noreferrer">live.lean-lang.org</a>
+    </div>
+  </div>
+</footer>
+  <script type="module" src="../assets/app.js"></script>
+</body>
+</html>

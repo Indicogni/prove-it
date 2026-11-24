@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';">
+  <meta name="referrer" content="no-referrer">
+  <title>Ch 11: Pure Effects &amp; Termination as DoS Defense — Prove It (Indicogni)</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-unit-id="11" data-unit-title="Ch 11: Pure Effects &amp; Termination as DoS Defense" data-prev-href="10.html" data-next-href="12.html">
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand-link" href="../index.html">
+      <span class="brand-org">indicogni</span>
+      <span class="brand-sep">/</span>
+      <span class="brand-title">Prove It</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="../index.html#curriculum" aria-current="page">Curriculum</a>
+      <a class="nav-link" href="../labs/index.html">6 Live Labs</a>
+      <a class="nav-link" href="../capstones/index.html">4 Capstones</a>
+      <a class="nav-link" href="../reference/tla-to-lean.html">TLA+ ↔ Lean</a>
+      <a class="nav-link" href="../reference/ai-playbook.html">AI Playbook</a>
+      <a class="nav-link" href="../reference/glossary.html">Glossary</a>
+    </nav>
+    <div class="nav-controls">
+      <span class="progress-pill" data-progress-summary>0/20 units · 0/6 labs</span>
+      <button type="button" class="icon-btn" data-action="open-shortcuts" title="Keyboard shortcuts (?)">Shortcuts (?)</button>
+      <button type="button" class="icon-btn" data-action="toggle-theme">Dark theme (t)</button>
+    </div>
+  </div>
+</header>
+<main class="chapter-shell">
+  <div class="chapter-header">
+    <div class="chapter-topbar">
+      <span class="badge badge-accent">Part III · Precision Types, Hardware &amp; Refinement</span>
+      <span class="badge">Ch 11 · 35 min · <code>ProveIt/Ch11.lean</code></span>
+    </div>
+    <h1>Pure Effects &amp; Termination as DoS Defense</h1>
+    <p class="hero-subtitle">Functional cores (`Except`, `StateM`), `termination_by` proofs against infinite-loop outages, and `fun_induction`.</p>
+
+    <div class="puzzle-box">
+      <span class="puzzle-title">5-Line Outage Bug · Malformed Packet Infinite-Loop DoS</span>
+      <pre><code>partial def parseChunks (buf : ByteArray) (offset : Nat) : List Nat :=
+  if offset &gt;= buf.size then []
+  else let chunkLen := buf.get! offset |&gt;.toNat
+       chunkLen :: parseChunks buf (offset + chunkLen)
+-- Attacker sends a 1-byte packet `[0x00]`. What happens on every worker thread?</code></pre>
+    </div>
+
+    <section class="prediction-card" id="prediction-card" aria-labelledby="pred-heading">
+      <div class="prediction-header">
+        <strong id="pred-heading">Socratic Gate · Commit to a Prediction</strong>
+        <span class="badge badge-open" data-prediction-status>Unanswered · Locks on commit</span>
+      </div>
+      <p>When an attacker sends `[0x00]`, `chunkLen = 0`, so `offset + chunkLen = offset`. Why did Lean allow this CPU-pinning infinite loop to compile above?</p>
+      <div class="prediction-options" data-prediction-options></div>
+      <button type="button" class="btn btn-primary btn-sm" data-action="lock-prediction" disabled>Lock Prediction &amp; Reveal Mechanism</button>
+      <div class="prediction-reveal" data-prediction-reveal hidden>
+        <strong>Why this happens:</strong>
+        <p data-prediction-explanation></p>
+      </div>
+    </section>
+  </div>
+
+  <article class="container-prose">
+    <h2>Imperative Readability, Pure Proof Power (`do` + `Except` / `StateM`)</h2>
+    <p>Real systems code uses early-return error handling and mutable-looking state updates. Lean 4&#x27;s <code>do</code> notation compiles <code>let mut</code>, <code>for</code>, and early <code>throw</code> over <code>Except Err</code> and <code>StateM S</code> directly into pure functional transformers—giving you imperative ergonomics in code and pure mathematical equations in proofs (the <strong>Functional Core, Imperative Shell</strong> architecture).</p>
+    <h2>`termination_by` + `fun_induction`</h2>
+    <p>Once you prove a recursive parser or binary search terminates (<code>termination_by hi - lo</code>), Lean automatically synthesizes a custom induction principle matched to that recursion (<code>fun_induction</code>), eliminating manual strong-induction boilerplate.</p>
+
+  </article>
+
+  <section class="workbench" id="chapter-workbench" aria-label="Interactive Lean 4 Infoview Stepper">
+    <div class="workbench-toolbar">
+      <div class="workbench-title">
+        <span>⊢</span>
+        <span>ProveIt/Ch11.lean · DoS-Proof Chunk Parser with `termination_by` &amp; `fun_induction`</span>
+      </div>
+      <div class="stepper-controls">
+        <button type="button" class="btn btn-sm" data-action="step-reset">⏮ Reset</button>
+        <button type="button" class="btn btn-sm" data-action="step-prev">← Prev (k)</button>
+        <span class="step-counter" data-step-counter>Step 1 / 1</span>
+        <button type="button" class="btn btn-sm btn-primary" data-action="step-next">Next (j) →</button>
+      </div>
+    </div>
+
+    <div class="workbench-split">
+      <div class="code-pane" aria-label="Lean 4 source code">
+        <div class="code-lines" data-code-lines></div>
+      </div>
+      <div class="infoview-pane" aria-live="polite" aria-label="Simulated Lean 4 Infoview">
+        <div class="infoview-header">
+          <span class="infoview-title">Lean Infoview</span>
+          <span class="badge badge-open" data-goal-badge>Open Goal</span>
+        </div>
+        <div>
+          <span class="infoview-section-label">Objects</span>
+          <div class="infoview-block" data-infoview-objects></div>
+        </div>
+        <div>
+          <span class="infoview-section-label">Hypotheses</span>
+          <div class="infoview-block" data-infoview-hyps></div>
+        </div>
+        <div>
+          <span class="infoview-section-label">⊢ Current Goal</span>
+          <div class="infoview-block infoview-goal" data-infoview-goal></div>
+        </div>
+        <div class="infoview-note" data-infoview-note></div>
+      </div>
+    </div>
+
+    <div class="workbench-footer">
+      <div class="action-group">
+        <a class="btn btn-primary btn-sm" data-playground-link href="https://live.lean-lang.org/#code=--%20Chapter%2011%3A%20Pure%20Effects%20%26%20Termination%20as%20DoS%20Defense%0Ainductive%20ParseErr%20%7C%20zeroStep%20%7C%20truncated%20deriving%20Repr%2C%20DecidableEq%0A%0Adef%20scanOffsets%20%28total%20offset%20%3A%20Nat%29%20%28stepSize%20%3A%20Nat%29%20%3A%20Except%20ParseErr%20%28List%20Nat%29%20%3A%3D%0A%20%20if%20offset%20%E2%89%A5%20total%20then%20.ok%20%5B%5D%0A%20%20else%20if%20stepSize%20%3D%200%20then%20.error%20.zeroStep%0A%20%20else%20do%0A%20%20%20%20let%20rest%20%E2%86%90%20scanOffsets%20total%20%28offset%20%2B%20stepSize%29%20stepSize%0A%20%20%20%20pure%20%28offset%20%3A%3A%20rest%29%0Atermination_by%20total%20-%20offset%0Adecreasing_by%20omega%0A%0A%23guard%20%28match%20scanOffsets%2010%200%200%20with%20%7C%20.error%20.zeroStep%20%3D%3E%20true%20%7C%20_%20%3D%3E%20false%29%0A%23guard%20%28match%20scanOffsets%206%20%200%202%20with%20%7C%20.ok%20%5B0%2C%202%2C%204%5D%20%20%20%20%3D%3E%20true%20%7C%20_%20%3D%3E%20false%29%0A%0Atheorem%20zero_step_rejected%20%28total%20offset%20%3A%20Nat%29%20%28h%20%3A%20offset%20%3C%20total%29%20%3A%0A%20%20%20%20scanOffsets%20total%20offset%200%20%3D%20.error%20.zeroStep%20%3A%3D%20by%0A%20%20unfold%20scanOffsets%0A%20%20simp%20only%20%5BNat.not_le.mpr%20h%2C%20%E2%86%93reduceIte%5D%0A" target="_blank" rel="noopener noreferrer">Run in Lean 4 Playground ↗</a>
+        <button type="button" class="btn btn-sm" data-action="copy-lean">Copy Lean snippet</button>
+      </div>
+      <div class="action-group">
+        <button type="button" class="btn btn-sm" data-copy-text="lake exe check ch11">Copy local command: <code>lake exe check ch11</code></button>
+      </div>
+    </div>
+  </section>
+
+  <div class="container-prose">
+    <div class="callout callout-verified">
+      <strong>Hands-On Exercise (ProveIt/Ch11.lean):</strong>
+      <p>In `ProveIt/Ch11.lean`, eliminate `partial` from a recursive packet/DAG resolver, prove termination against attacker-crafted inputs, and verify its `Except`/`StateM` properties with `fun_induction`.</p>
+    </div>
+
+    <div class="chapter-complete-bar">
+      <div>
+        <strong>Finished the Socratic gate, Infoview trace, and playground run?</strong><br>
+        <span>Record completion in local browser storage to track your 20-unit progress.</span>
+      </div>
+      <button type="button" class="btn btn-verified" data-action="toggle-complete">Mark chapter complete</button>
+    </div>
+
+    <nav class="chapter-pager" aria-label="Chapter pagination">
+      <a class="pager-card" href="10.html"><span class="pager-dir">← Previous ([) · Ch 10</span><span class="pager-title">64-Bit Hardware Truth (`UInt64` &amp; `BitVec`)</span></a>
+      <a class="pager-card align-right" href="12.html"><span class="pager-dir">Next (]) · Ch 12 →</span><span class="pager-title">Refinement Mappings &amp; Stuttering Steps</span></a>
+    </nav>
+  </div>
+</main>
+<div class="modal-backdrop" id="shortcut-modal" hidden role="dialog" aria-modal="true" aria-labelledby="shortcut-modal-title">
+  <div class="modal-dialog">
+    <div class="prediction-header">
+      <h3 id="shortcut-modal-title">Keyboard Shortcuts</h3>
+      <button type="button" class="btn btn-sm" data-action="close-shortcuts">Close (Esc)</button>
+    </div>
+    <div class="shortcut-row"><span>Step tactic forward in Infoview</span><kbd>j</kbd></div>
+    <div class="shortcut-row"><span>Step tactic backward in Infoview</span><kbd>k</kbd></div>
+    <div class="shortcut-row"><span>Previous unit / chapter</span><kbd>[</kbd></div>
+    <div class="shortcut-row"><span>Next unit / chapter</span><kbd>]</kbd></div>
+    <div class="shortcut-row"><span>Toggle Light / Dark theme</span><kbd>t</kbd></div>
+    <div class="shortcut-row"><span>Open or close this help dialog</span><kbd>?</kbd></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <strong>Indicogni LLC</strong> · <em>Prove It: Formally Verified Software in Lean 4</em><br>
+      Pinned to zero-dependency Core/<code>Std</code> Lean <code>v4.36.0</code>. Zero cookies, zero analytics, zero tracking.
+    </div>
+    <div>
+      Code: MIT · Prose &amp; SVG Diagrams: CC BY 4.0 · Feedback &amp; security: <code>feedback@indicogni.com</code><br>
+      <a href="https://github.com/indicogni/prove-it" target="_blank" rel="noopener noreferrer">github.com/indicogni/prove-it</a> ·
+      <a href="https://live.lean-lang.org/" target="_blank" rel="noopener noreferrer">live.lean-lang.org</a>
+    </div>
+  </div>
+</footer>
+  <script type="module" src="../assets/app.js"></script>
+</body>
+</html>

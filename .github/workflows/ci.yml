@@ -1,0 +1,127 @@
+name: Prove It Verification & Security CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      deploy_pages:
+        description: "Deploy site/ to GitHub Pages after verification passes"
+        required: false
+        default: false
+        type: boolean
+
+# Strict least-privilege default token permissions across all jobs
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  verify:
+    name: Audit, Build, VeriGate & Differential Fuzzing
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository (zero persisted credentials)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Step 1 — Run Zero-PII, Git Identity & HTML/CSP Security Audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/audit_security.py
+
+      - name: Cache elan toolchain & Lake build artifacts
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.elan
+            .lake/build
+          key: lean-${{ runner.os }}-${{ hashFiles('lean-toolchain', 'lakefile.toml') }}
+          restore-keys: |
+            lean-${{ runner.os }}-${{ hashFiles('lean-toolchain') }}-
+
+      - name: Step 2 — Install pinned elan toolchain & run lake build
+        shell: bash
+        run: |
+          set -euo pipefail
+          TOOLCHAIN="$(tr -d '[:space:]' < lean-toolchain)"
+          if [ ! -x "$HOME/.elan/bin/lake" ]; then
+            tmp_installer="$(mktemp)"
+            trap 'rm -f "$tmp_installer"' EXIT
+            curl --proto '=https' --tlsv1.2 -sSfL \
+              https://raw.githubusercontent.com/leanprover/elan/3cc76985a1becb3c03cd65c1c5007e6f186ae474/elan-init.sh \
+              -o "$tmp_installer"
+            sh "$tmp_installer" -y --no-modify-path --default-toolchain "$TOOLCHAIN"
+          fi
+          export PATH="$HOME/.elan/bin:$PATH"
+          elan default "$TOOLCHAIN"
+          lean --version
+          lake build
+
+      - name: Step 3 — Verify model solutions & run VeriGate soundness self-test
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PATH="$HOME/.elan/bin:$PATH"
+          lake exe check --solutions
+          lake exe verigate --self-test
+
+      - name: Step 4 — Run Polyglot Differential Fuzzing against Lean Oracle
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PATH="$HOME/.elan/bin:$PATH"
+          python3 scripts/fuzz_against_oracle.py
+          python3 scripts/fuzz_against_oracle.py --demo-bug --expect-bug
+
+  pages:
+    name: Deploy Interactive Course Site (GitHub Pages)
+    needs: verify
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.DEPLOY_PAGES == 'true') ||
+      (github.event_name == 'workflow_dispatch' && inputs.deploy_pages == true)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout repository (zero persisted credentials)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Re-verify site/ HTML & CSP safety before publishing
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/audit_security.py
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      - name: Upload site/ static artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

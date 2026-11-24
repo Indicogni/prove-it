@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';">
+  <meta name="referrer" content="no-referrer">
+  <title>Ch 05: Proofs Are Programs, Goals Are Stack Traces — Prove It (Indicogni)</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-unit-id="05" data-unit-title="Ch 05: Proofs Are Programs, Goals Are Stack Traces" data-prev-href="cp1.html" data-next-href="06.html">
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand-link" href="../index.html">
+      <span class="brand-org">indicogni</span>
+      <span class="brand-sep">/</span>
+      <span class="brand-title">Prove It</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="../index.html#curriculum" aria-current="page">Curriculum</a>
+      <a class="nav-link" href="../labs/index.html">6 Live Labs</a>
+      <a class="nav-link" href="../capstones/index.html">4 Capstones</a>
+      <a class="nav-link" href="../reference/tla-to-lean.html">TLA+ ↔ Lean</a>
+      <a class="nav-link" href="../reference/ai-playbook.html">AI Playbook</a>
+      <a class="nav-link" href="../reference/glossary.html">Glossary</a>
+    </nav>
+    <div class="nav-controls">
+      <span class="progress-pill" data-progress-summary>0/20 units · 0/6 labs</span>
+      <button type="button" class="icon-btn" data-action="open-shortcuts" title="Keyboard shortcuts (?)">Shortcuts (?)</button>
+      <button type="button" class="icon-btn" data-action="toggle-theme">Dark theme (t)</button>
+    </div>
+  </div>
+</header>
+<main class="chapter-shell">
+  <div class="chapter-header">
+    <div class="chapter-topbar">
+      <span class="badge badge-accent">Part II · The Proof Engine &amp; Gear 2</span>
+      <span class="badge">Ch 05 · 30 min · <code>ProveIt/Ch05.lean</code></span>
+    </div>
+    <h1>Proofs Are Programs, Goals Are Stack Traces</h1>
+    <p class="hero-subtitle">Reading the Lean Infoview cleanly and mastering `→`, `∧`, `∨`, `¬`, `∀`, and `∃` as typed API contracts.</p>
+
+    <div class="puzzle-box">
+      <span class="puzzle-title">5-Line Mental-Model Shift · Propositions as Function Signatures</span>
+      <pre><code>-- Look at these two Lean declarations side by side:
+def applyFallback (f : Req → Resp) (x : Req) : Resp := f x
+theorem applyImplication (h_imp : SafeConfig → NoOutage) (h_cfg : SafeConfig) : NoOutage :=
+  h_imp h_cfg
+-- Why do `def` and `theorem` have the EXACT same body?</code></pre>
+    </div>
+
+    <section class="prediction-card" id="prediction-card" aria-labelledby="pred-heading">
+      <div class="prediction-header">
+        <strong id="pred-heading">Socratic Gate · Commit to a Prediction</strong>
+        <span class="badge badge-open" data-prediction-status>Unanswered · Locks on commit</span>
+      </div>
+      <p>If an implication `P → Q` is a function taking a proof of `P` to a proof of `Q`, what data structure corresponds to proving `P ∧ Q` (`And P Q`)?</p>
+      <div class="prediction-options" data-prediction-options></div>
+      <button type="button" class="btn btn-primary btn-sm" data-action="lock-prediction" disabled>Lock Prediction &amp; Reveal Mechanism</button>
+      <div class="prediction-reveal" data-prediction-reveal hidden>
+        <strong>Why this happens:</strong>
+        <p data-prediction-explanation></p>
+      </div>
+    </section>
+  </div>
+
+  <article class="container-prose">
+    <h2>Reading the Lean Infoview Like a Debugger Frame</h2>
+    <p>Every time you click inside a <code>by ...</code> block, Lean&#x27;s <strong>Infoview</strong> shows your live stack frame: <strong>Objects</strong> (<code>req : Request</code>, <code>n : Nat</code>) are function arguments in scope; <strong>Hypotheses</strong> (<code>h1 : Valid req</code>, <code>h2 : n &lt; 100</code>) are local immutable bindings holding proofs you already possess; and <strong>⊢ Goal</strong> is the return type your remaining block must construct.</p>
+    <p>Every logical connective has two moves: how to <strong>build</strong> it when it sits in the <code>⊢ Goal</code>, and how to <strong>unpack</strong> it when it sits in a hypothesis <code>h</code>.</p>
+    <h2>The Six Core Connectives Cheat-Sheet</h2>
+    <p><code>P → Q</code> and <code>∀ x, P x</code>: build with <code>intro</code>, use by calling <code>h x</code> (<code>apply</code> / <code>exact</code>). <code>P ∧ Q</code>: build with <code>constructor</code> (or <code>⟨hp, hq⟩</code>), unpack with <code>rcases h with ⟨hp, hq⟩</code>. <code>P ∨ Q</code>: build with <code>left</code> or <code>right</code>, unpack with <code>rcases h with hp | hq</code> (must handle <em>both</em> cases!). <code>∃ x, P x</code>: build by supplying a concrete witness <code>⟨witness, proof⟩</code> (<code>refine ⟨w, ?_⟩</code>), unpack with <code>rcases h with ⟨x, hx⟩</code>. And <code>¬P</code> is defined as <code>P → False</code>—a function showing <code>P</code> leads to contradiction!</p>
+
+  </article>
+
+  <section class="workbench" id="chapter-workbench" aria-label="Interactive Lean 4 Infoview Stepper">
+    <div class="workbench-toolbar">
+      <div class="workbench-title">
+        <span>⊢</span>
+        <span>ProveIt/Ch05.lean · Unpacking &amp; Building Logical Contracts</span>
+      </div>
+      <div class="stepper-controls">
+        <button type="button" class="btn btn-sm" data-action="step-reset">⏮ Reset</button>
+        <button type="button" class="btn btn-sm" data-action="step-prev">← Prev (k)</button>
+        <span class="step-counter" data-step-counter>Step 1 / 1</span>
+        <button type="button" class="btn btn-sm btn-primary" data-action="step-next">Next (j) →</button>
+      </div>
+    </div>
+
+    <div class="workbench-split">
+      <div class="code-pane" aria-label="Lean 4 source code">
+        <div class="code-lines" data-code-lines></div>
+      </div>
+      <div class="infoview-pane" aria-live="polite" aria-label="Simulated Lean 4 Infoview">
+        <div class="infoview-header">
+          <span class="infoview-title">Lean Infoview</span>
+          <span class="badge badge-open" data-goal-badge>Open Goal</span>
+        </div>
+        <div>
+          <span class="infoview-section-label">Objects</span>
+          <div class="infoview-block" data-infoview-objects></div>
+        </div>
+        <div>
+          <span class="infoview-section-label">Hypotheses</span>
+          <div class="infoview-block" data-infoview-hyps></div>
+        </div>
+        <div>
+          <span class="infoview-section-label">⊢ Current Goal</span>
+          <div class="infoview-block infoview-goal" data-infoview-goal></div>
+        </div>
+        <div class="infoview-note" data-infoview-note></div>
+      </div>
+    </div>
+
+    <div class="workbench-footer">
+      <div class="action-group">
+        <a class="btn btn-primary btn-sm" data-playground-link href="https://live.lean-lang.org/#code=--%20Chapter%2005%3A%20Proofs%20Are%20Programs%2C%20Goals%20Are%20Stack%20Traces%0Atheorem%20sla_handoff%20%28PrimaryUp%20BackupUp%20Serving%20%3A%20Prop%29%0A%20%20%20%20%28h_either%20%3A%20PrimaryUp%20%E2%88%A8%20BackupUp%29%0A%20%20%20%20%28h_prim%20%20%20%3A%20PrimaryUp%20%E2%86%92%20Serving%29%0A%20%20%20%20%28h_back%20%20%20%3A%20BackupUp%20%20%E2%86%92%20Serving%29%20%3A%0A%20%20%20%20Serving%20%3A%3D%20by%0A%20%20rcases%20h_either%20with%20hp%20%7C%20hb%0A%20%20%C2%B7%20exact%20h_prim%20hp%0A%20%20%C2%B7%20exact%20h_back%20hb%0A%0Atheorem%20witness_safe_port%20%3A%20%E2%88%83%20p%20%3A%20Nat%2C%20p%20%3E%201024%20%E2%88%A7%20p%20%3C%2065535%20%3A%3D%0A%20%20%E2%9F%A88080%2C%20by%20omega%E2%9F%A9%0A" target="_blank" rel="noopener noreferrer">Run in Lean 4 Playground ↗</a>
+        <button type="button" class="btn btn-sm" data-action="copy-lean">Copy Lean snippet</button>
+      </div>
+      <div class="action-group">
+        <button type="button" class="btn btn-sm" data-copy-text="lake exe check ch05">Copy local command: <code>lake exe check ch05</code></button>
+      </div>
+    </div>
+  </section>
+
+  <div class="container-prose">
+    <div class="callout callout-verified">
+      <strong>Hands-On Exercise (ProveIt/Ch05.lean):</strong>
+      <p>In `ProveIt/Ch05.lean`, practice driving the Infoview across conjunctions, disjunctions, negations, and existential witnesses without guesswork.</p>
+    </div>
+
+    <div class="chapter-complete-bar">
+      <div>
+        <strong>Finished the Socratic gate, Infoview trace, and playground run?</strong><br>
+        <span>Record completion in local browser storage to track your 20-unit progress.</span>
+      </div>
+      <button type="button" class="btn btn-verified" data-action="toggle-complete">Mark chapter complete</button>
+    </div>
+
+    <nav class="chapter-pager" aria-label="Chapter pagination">
+      <a class="pager-card" href="cp1.html"><span class="pager-dir">← Previous ([) · CP 1</span><span class="pager-title">Checkpoint 1: Zero-Panic Rollout Router</span></a>
+      <a class="pager-card align-right" href="06.html"><span class="pager-dir">Next (]) · Ch 06 →</span><span class="pager-title">Control Flow, Rewriting &amp; Linear Math</span></a>
+    </nav>
+  </div>
+</main>
+<div class="modal-backdrop" id="shortcut-modal" hidden role="dialog" aria-modal="true" aria-labelledby="shortcut-modal-title">
+  <div class="modal-dialog">
+    <div class="prediction-header">
+      <h3 id="shortcut-modal-title">Keyboard Shortcuts</h3>
+      <button type="button" class="btn btn-sm" data-action="close-shortcuts">Close (Esc)</button>
+    </div>
+    <div class="shortcut-row"><span>Step tactic forward in Infoview</span><kbd>j</kbd></div>
+    <div class="shortcut-row"><span>Step tactic backward in Infoview</span><kbd>k</kbd></div>
+    <div class="shortcut-row"><span>Previous unit / chapter</span><kbd>[</kbd></div>
+    <div class="shortcut-row"><span>Next unit / chapter</span><kbd>]</kbd></div>
+    <div class="shortcut-row"><span>Toggle Light / Dark theme</span><kbd>t</kbd></div>
+    <div class="shortcut-row"><span>Open or close this help dialog</span><kbd>?</kbd></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <strong>Indicogni LLC</strong> · <em>Prove It: Formally Verified Software in Lean 4</em><br>
+      Pinned to zero-dependency Core/<code>Std</code> Lean <code>v4.36.0</code>. Zero cookies, zero analytics, zero tracking.
+    </div>
+    <div>
+      Code: MIT · Prose &amp; SVG Diagrams: CC BY 4.0 · Feedback &amp; security: <code>feedback@indicogni.com</code><br>
+      <a href="https://github.com/indicogni/prove-it" target="_blank" rel="noopener noreferrer">github.com/indicogni/prove-it</a> ·
+      <a href="https://live.lean-lang.org/" target="_blank" rel="noopener noreferrer">live.lean-lang.org</a>
+    </div>
+  </div>
+</footer>
+  <script type="module" src="../assets/app.js"></script>
+</body>
+</html>

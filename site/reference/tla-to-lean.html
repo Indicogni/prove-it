@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';">
+  <meta name="referrer" content="no-referrer">
+  <title>TLA+ to Lean 4 Rosetta Stone — Prove It (Indicogni)</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand-link" href="../index.html">
+      <span class="brand-org">indicogni</span>
+      <span class="brand-sep">/</span>
+      <span class="brand-title">Prove It</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="../index.html#curriculum">Curriculum</a>
+      <a class="nav-link" href="../labs/index.html">6 Live Labs</a>
+      <a class="nav-link" href="../capstones/index.html">4 Capstones</a>
+      <a class="nav-link" href="../reference/tla-to-lean.html" aria-current="page">TLA+ ↔ Lean</a>
+      <a class="nav-link" href="../reference/ai-playbook.html">AI Playbook</a>
+      <a class="nav-link" href="../reference/glossary.html">Glossary</a>
+    </nav>
+    <div class="nav-controls">
+      <span class="progress-pill" data-progress-summary>0/20 units · 0/6 labs</span>
+      <button type="button" class="icon-btn" data-action="open-shortcuts" title="Keyboard shortcuts (?)">Shortcuts (?)</button>
+      <button type="button" class="icon-btn" data-action="toggle-theme">Dark theme (t)</button>
+    </div>
+  </div>
+</header>
+<main class="container-wide">
+  <span class="eyebrow">Systems Specification Reference</span>
+  <h1>TLA+ ↔ Lean 4 Rosetta Stone</h1>
+  <p class="hero-subtitle">
+    Already think in Lamport's state machines, invariants, TLC model checking, and refinement mappings? Filter every TLA+ construct alongside its idiomatic zero-dependency Lean 4 counterpart.
+  </p>
+
+  <div class="filter-bar">
+    <input type="search" class="search-input" data-filter-input placeholder="Search TLA+ or Lean constructs (e.g., UNCHANGED, stuttering, Init, BFS)...">
+    <button type="button" class="btn btn-sm btn-primary" data-filter-cat="all">All</button>
+    <button type="button" class="btn btn-sm" data-filter-cat="state">State &amp; Init</button>
+    <button type="button" class="btn btn-sm" data-filter-cat="transitions">Next &amp; UNCHANGED</button>
+    <button type="button" class="btn btn-sm" data-filter-cat="checking">Gear 1 BFS</button>
+    <button type="button" class="btn btn-sm" data-filter-cat="invariants">Gear 2 Invariants</button>
+    <button type="button" class="btn btn-sm" data-filter-cat="refinement">Refinement</button>
+    <button type="button" class="btn btn-sm" data-filter-cat="progress">Termination</button>
+  </div>
+  <p class="step-counter" data-filter-count></p>
+
+  <article class="rosetta-card" data-filter-item data-cat="state">
+    <div class="prediction-header">
+      <h3>State Variables (`VARIABLES`)</h3>
+      <button type="button" class="btn btn-sm" data-copy-target="rosetta-lean-1">Copy Lean pattern</button>
+    </div>
+    <p>TLA+ declares untyped global variables; Lean groups state cleanly into a typed `structure`.</p>
+    <div class="rosetta-pair">
+      <div>
+        <span class="infoview-section-label">TLA+ / PlusCal Idiom</span>
+        <pre><code>VARIABLES leaderEpoch, storageEpoch, committedVal</code></pre>
+      </div>
+      <div>
+        <span class="infoview-section-label">Lean 4.36.0 Idiom</span>
+        <pre><code id="rosetta-lean-1">structure SysState where
+  leaderEpoch  : Nat
+  storageEpoch : Nat
+  committedVal : Option String</code></pre>
+      </div>
+    </div>
+  </article>
+  <article class="rosetta-card" data-filter-item data-cat="state">
+    <div class="prediction-header">
+      <h3>Initial State Predicate (`Init`)</h3>
+      <button type="button" class="btn btn-sm" data-copy-target="rosetta-lean-2">Copy Lean pattern</button>
+    </div>
+    <p>Express deterministic initialization as a value `init : S` or nondeterministic initial sets as `Init : S → Prop`.</p>
+    <div class="rosetta-pair">
+      <div>
+        <span class="infoview-section-label">TLA+ / PlusCal Idiom</span>
+        <pre><code>Init ==
+  /\ leaderEpoch = 1
+  /\ storageEpoch = 1
+  /\ committedVal = &quot;none&quot;</code></pre>
+      </div>
+      <div>
+        <span class="infoview-section-label">Lean 4.36.0 Idiom</span>
+        <pre><code id="rosetta-lean-2">def Init (s : SysState) : Prop :=
+  s.leaderEpoch = 1 ∧
+  s.storageEpoch = 1 ∧
+  s.committedVal = none</code></pre>
+      </div>
+    </div>
+  </article>
+  <article class="rosetta-card" data-filter-item data-cat="transitions">
+    <div class="prediction-header">
+      <h3>Next-State Relation (`Next`) &amp; `UNCHANGED`</h3>
+      <button type="button" class="btn btn-sm" data-copy-target="rosetta-lean-3">Copy Lean pattern</button>
+    </div>
+    <p>Record update syntax `{ s with field := v }` automatically keeps all unmentioned fields `UNCHANGED` without forgetting any!</p>
+    <div class="rosetta-pair">
+      <div>
+        <span class="infoview-section-label">TLA+ / PlusCal Idiom</span>
+        <pre><code>BumpEpoch ==
+  /\ leaderEpoch&#x27; = leaderEpoch + 1
+  /\ UNCHANGED &lt;&lt;storageEpoch, committedVal&gt;&gt;
+
+Next == BumpEpoch \/ CommitWrite</code></pre>
+      </div>
+      <div>
+        <span class="infoview-section-label">Lean 4.36.0 Idiom</span>
+        <pre><code id="rosetta-lean-3">inductive Next : SysState → SysState → Prop
+  | bumpEpoch (s : SysState) :
+      Next s { s with leaderEpoch := s.leaderEpoch + 1 }
+  | commitWrite (s : SysState) (v : String)
+      (h : s.leaderEpoch ≥ s.storageEpoch) :
+      Next s { s with storageEpoch := s.leaderEpoch, committedVal := some v }</code></pre>
+      </div>
+    </div>
+  </article>
+  <article class="rosetta-card" data-filter-item data-cat="checking">
+    <div class="prediction-header">
+      <h3>Gear 1: TLC Bounded Model Checking (`Spec =&gt; []TypeOK /\ []Safe`)</h3>
+      <button type="button" class="btn btn-sm" data-copy-target="rosetta-lean-4">Copy Lean pattern</button>
+    </div>
+    <p>Executable `step : S → List S` explored via pure BFS catches shallow bugs in milliseconds via `#guard`.</p>
+    <div class="rosetta-pair">
+      <div>
+        <span class="infoview-section-label">TLA+ / PlusCal Idiom</span>
+        <pre><code>-- In MCMini.cfg:
+SPECIFICATION Spec
+INVARIANT Safe</code></pre>
+      </div>
+      <div>
+        <span class="infoview-section-label">Lean 4.36.0 Idiom</span>
+        <pre><code id="rosetta-lean-4">-- Pure Lean Gear 1 BFS (Ch 04):
+#guard bfsExplore 6 [initSys] == .allSafe</code></pre>
+      </div>
+    </div>
+  </article>
+  <article class="rosetta-card" data-filter-item data-cat="invariants">
+    <div class="prediction-header">
+      <h3>Gear 2: Inductive Invariant (`Init =&gt; Inv` &amp; `Inv /\ Next =&gt; Inv&#x27;`)</h3>
+      <button type="button" class="btn btn-sm" data-copy-target="rosetta-lean-5">Copy Lean pattern</button>
+    </div>
+    <p>Equivalent to TLAPS `THEOREM Spec =&gt; []Safe` via strengthened invariant `Inv`.</p>
+    <div class="rosetta-pair">
+      <div>
+        <span class="infoview-section-label">TLA+ / PlusCal Idiom</span>
+        <pre><code>Inv ==
+  /\ Safe
+  /\ committedVal /= &quot;none&quot; =&gt; storageEpoch &gt;= 1
+
+THEOREM Init =&gt; Inv
+THEOREM Inv /\ [Next]_vars =&gt; Inv&#x27;</code></pre>
+      </div>
+      <div>
+        <span class="infoview-section-label">Lean 4.36.0 Idiom</span>
+        <pre><code id="rosetta-lean-5">theorem inv_init (s : SysState) : Init s → Inv s := ...
+theorem inv_next (s s&#x27; : SysState) : Inv s → Next s s&#x27; → Inv s&#x27; := ...
+theorem reachable_safe (s : SysState) : Reachable s → Safe s := ...</code></pre>
+      </div>
+    </div>
+  </article>
+  <article class="rosetta-card" data-filter-item data-cat="refinement">
+    <div class="prediction-header">
+      <h3>Refinement Mapping &amp; Stuttering (`INSTANCE Abs WITH ...`)</h3>
+      <button type="button" class="btn btn-sm" data-copy-target="rosetta-lean-6">Copy Lean pattern</button>
+    </div>
+    <p>Concrete implementation steps map either to an abstract `SpecNext` step or an abstract stuttering step `abs s&#x27; = abs s`.</p>
+    <div class="rosetta-pair">
+      <div>
+        <span class="infoview-section-label">TLA+ / PlusCal Idiom</span>
+        <pre><code>Abs == INSTANCE SpecKV
+  WITH kv &lt;- [k \in Keys |-&gt; LookupLog(log, k)]
+
+THEOREM ImplSpec =&gt; Abs!Spec</code></pre>
+      </div>
+      <div>
+        <span class="infoview-section-label">Lean 4.36.0 Idiom</span>
+        <pre><code id="rosetta-lean-6">def abs (impl : ImplKV) : SpecKV := lookupLog impl.log
+
+theorem compact_stutters (impl : ImplKV) :
+    abs (compact impl) = abs impl := ...</code></pre>
+      </div>
+    </div>
+  </article>
+  <article class="rosetta-card" data-filter-item data-cat="progress">
+    <div class="prediction-header">
+      <h3>Bounded Progress / Termination (`WF_vars` / Variant Function)</h3>
+      <button type="button" class="btn btn-sm" data-copy-target="rosetta-lean-7">Copy Lean pattern</button>
+    </div>
+    <p>Lean&#x27;s `termination_by` proves a well-founded ranking measure strictly decreases, guaranteeing zero infinite internal loops.</p>
+    <div class="rosetta-pair">
+      <div>
+        <span class="infoview-section-label">TLA+ / PlusCal Idiom</span>
+        <pre><code>Variant == totalBytes - offset
+THEOREM ParseStep =&gt; Variant&#x27; &lt; Variant</code></pre>
+      </div>
+      <div>
+        <span class="infoview-section-label">Lean 4.36.0 Idiom</span>
+        <pre><code id="rosetta-lean-7">def parseAll (buf : ByteArray) (offset : Nat) : ...
+  ...
+termination_by buf.size - offset
+decreasing_by omega</code></pre>
+      </div>
+    </div>
+  </article>
+
+</main>
+<div class="modal-backdrop" id="shortcut-modal" hidden role="dialog" aria-modal="true" aria-labelledby="shortcut-modal-title">
+  <div class="modal-dialog">
+    <div class="prediction-header">
+      <h3 id="shortcut-modal-title">Keyboard Shortcuts</h3>
+      <button type="button" class="btn btn-sm" data-action="close-shortcuts">Close (Esc)</button>
+    </div>
+    <div class="shortcut-row"><span>Step tactic forward in Infoview</span><kbd>j</kbd></div>
+    <div class="shortcut-row"><span>Step tactic backward in Infoview</span><kbd>k</kbd></div>
+    <div class="shortcut-row"><span>Previous unit / chapter</span><kbd>[</kbd></div>
+    <div class="shortcut-row"><span>Next unit / chapter</span><kbd>]</kbd></div>
+    <div class="shortcut-row"><span>Toggle Light / Dark theme</span><kbd>t</kbd></div>
+    <div class="shortcut-row"><span>Open or close this help dialog</span><kbd>?</kbd></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <strong>Indicogni LLC</strong> · <em>Prove It: Formally Verified Software in Lean 4</em><br>
+      Pinned to zero-dependency Core/<code>Std</code> Lean <code>v4.36.0</code>. Zero cookies, zero analytics, zero tracking.
+    </div>
+    <div>
+      Code: MIT · Prose &amp; SVG Diagrams: CC BY 4.0 · Feedback &amp; security: <code>feedback@indicogni.com</code><br>
+      <a href="https://github.com/indicogni/prove-it" target="_blank" rel="noopener noreferrer">github.com/indicogni/prove-it</a> ·
+      <a href="https://live.lean-lang.org/" target="_blank" rel="noopener noreferrer">live.lean-lang.org</a>
+    </div>
+  </div>
+</footer>
+  <script type="module" src="../assets/app.js"></script>
+  <script type="module" src="../assets/reference.js"></script>
+</body>
+</html>

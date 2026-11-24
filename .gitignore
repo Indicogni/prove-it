@@ -1,0 +1,10 @@
+/.lake/
+/build/
+*.olean
+*.ilean
+*.trace
+__pycache__/
+*.pyc
+.DS_Store
+NOTES.md.bak*
+.prove_it_progress.json

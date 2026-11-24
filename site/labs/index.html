@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';">
+  <meta name="referrer" content="no-referrer">
+  <title>6 Interactive Browser Labs — Prove It (Indicogni)</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand-link" href="../index.html">
+      <span class="brand-org">indicogni</span>
+      <span class="brand-sep">/</span>
+      <span class="brand-title">Prove It</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="../index.html#curriculum">Curriculum</a>
+      <a class="nav-link" href="../labs/index.html" aria-current="page">6 Live Labs</a>
+      <a class="nav-link" href="../capstones/index.html">4 Capstones</a>
+      <a class="nav-link" href="../reference/tla-to-lean.html">TLA+ ↔ Lean</a>
+      <a class="nav-link" href="../reference/ai-playbook.html">AI Playbook</a>
+      <a class="nav-link" href="../reference/glossary.html">Glossary</a>
+    </nav>
+    <div class="nav-controls">
+      <span class="progress-pill" data-progress-summary>0/20 units · 0/6 labs</span>
+      <button type="button" class="icon-btn" data-action="open-shortcuts" title="Keyboard shortcuts (?)">Shortcuts (?)</button>
+      <button type="button" class="icon-btn" data-action="toggle-theme">Dark theme (t)</button>
+    </div>
+  </div>
+</header>
+<main class="container-wide">
+  <span class="eyebrow">Zero-Install Client-Side Simulators</span>
+  <h1>6 Interactive Verification Labs</h1>
+  <p class="hero-subtitle">
+    Experiment directly in your browser with tactic goal transformations, TLA+ split-brain BFS search vs. inductive invariant funnels, kernel axiom taint graphs, zero-byte proof erasure, 64-bit hardware wrap-around, and adversarial AI red-teaming.
+  </p>
+
+  <nav class="lab-nav" aria-label="Jump to Lab">
+    <a class="btn btn-sm" href="#lab-1">Lab 1 · Infoview &amp; Tactics</a>
+    <a class="btn btn-sm" href="#lab-2">Lab 2 · Split-Brain BFS vs Funnel</a>
+    <a class="btn btn-sm" href="#lab-3">Lab 3 · Kernel &amp; #print axioms DAG</a>
+    <a class="btn btn-sm" href="#lab-4">Lab 4 · Proof Erasure &amp; Decidable</a>
+    <a class="btn btn-sm" href="#lab-5">Lab 5 · 64-Bit BitVec vs Nat</a>
+    <a class="btn btn-sm" href="#lab-6">Lab 6 · AI Spec-Gaming Red-Team</a>
+  </nav>
+
+  <!-- LAB 1 -->
+  <section class="lab-card" id="lab-1">
+    <div class="prediction-header">
+      <span class="badge badge-accent">Lab 1 · Chapters 01, 05 &amp; 06</span>
+      <span class="badge badge-open" id="lab1-badge">Open Goal</span>
+    </div>
+    <h2>Interactive Lean Infoview &amp; Tactic Stepper</h2>
+    <p>Select a theorem, step with <kbd>j</kbd> / <kbd>k</kbd>, or test tactics directly from the palette to see why applicable tactics advance the goal and mismatched tactics fail.</p>
+    <div id="lab1-root">
+      <div class="lab-controls">
+        <label for="lab1-select"><strong>Theorem:</strong></label>
+        <select id="lab1-select" class="lab-select">
+          <option value="quota">1. Safe Quota Withdraw Conservation</option>
+          <option value="canary">2. Canary Router Fail-Closed Default</option>
+          <option value="idempotent">3. Idempotent Write-Ahead Ledger Replay</option>
+        </select>
+        <button type="button" class="btn btn-sm" id="lab1-reset">⏮ Reset</button>
+        <button type="button" class="btn btn-sm" id="lab1-prev">← Prev (k)</button>
+        <button type="button" class="btn btn-sm btn-primary" id="lab1-next">Next (j) →</button>
+        <a class="btn btn-sm" id="lab1-playground" href="https://live.lean-lang.org/" target="_blank" rel="noopener noreferrer">Run in Playground ↗</a>
+      </div>
+      <div class="lab-controls" id="lab1-palette">
+        <strong>Apply tactic:</strong>
+      </div>
+      <p class="step-counter" id="lab1-counter"></p>
+      <div class="lab-output-grid">
+        <div>
+          <span class="infoview-section-label">Objects</span>
+          <div class="infoview-block" id="lab1-objects"></div>
+          <span class="infoview-section-label">Hypotheses</span>
+          <div class="infoview-block" id="lab1-hyps"></div>
+        </div>
+        <div>
+          <span class="infoview-section-label">⊢ Goal</span>
+          <div class="infoview-block infoview-goal" id="lab1-goal"></div>
+          <span class="infoview-section-label">Coach Feedback</span>
+          <div class="infoview-note" id="lab1-feedback"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAB 2 -->
+  <section class="lab-card" id="lab-2">
+    <div class="prediction-header">
+      <span class="badge badge-accent">Lab 2 · Chapters 04 &amp; 08 + Capstone 2</span>
+      <span class="badge badge-refuted" id="lab2-status">Running BFS...</span>
+    </div>
+    <h2>Fencing-Lease Split-Brain BFS Explorer vs. Inductive Invariant Funnel</h2>
+    <p>Toggle network delay / GC pause and monotonic fencing tokens (`msg.epoch ≥ storage.fencedEpoch`). Watch Gear 1 BFS discover a live split-brain trace when unfenced, then inspect why Gear 2 needs invariant strengthening to exclude Garden-of-Eden states.</p>
+    <div class="lab-controls">
+      <label class="toggle-label">
+        <input type="checkbox" id="lab2-delay" checked>
+        Simulate GC Pause / Delayed Network Packet
+      </label>
+      <label class="toggle-label">
+        <input type="checkbox" id="lab2-fence">
+        Enable Monotonic Fencing Guard (<code>txEpoch ≥ storageEpoch</code>)
+      </label>
+      <button type="button" class="btn btn-sm" id="lab2-garden-btn">Test Unreachable Garden-of-Eden State</button>
+    </div>
+    <div class="lab-output-grid">
+      <div>
+        <span class="infoview-section-label">Gear 1 · Live BFS State-Space Trace</span>
+        <ul class="trace-list" id="lab2-trace"></ul>
+      </div>
+      <div>
+        <span class="infoview-section-label">Gear 2 · State-Space Invariant Funnel</span>
+        <div class="funnel-ring">
+          <strong>All Syntactic States</strong> (arbitrary struct values)
+          <div class="funnel-ring funnel-safe">
+            <strong>Safe States</strong> (<code>¬corrupted</code> — includes Garden-of-Eden traps!)
+            <div class="funnel-ring funnel-inductive">
+              <strong>Strengthened Inductive Invariant</strong> (<code>¬corrupted ∧ (committedEp2 → storageEpoch ≥ 2)</code>)
+              <div class="funnel-ring funnel-reachable">
+                <strong>Reachable States</strong> (from <code>Init</code> via <code>Next*</code> across ∞ epochs)
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="infoview-note" id="lab2-funnel-note"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAB 3 -->
+  <section class="lab-card" id="lab-3">
+    <div class="prediction-header">
+      <span class="badge badge-accent">Lab 3 · Chapters 10 &amp; 13 + VeriGate</span>
+      <div class="action-group">
+        <span class="badge badge-verified" id="lab3-tier0">Tier 0: PASS</span>
+        <span class="badge badge-verified" id="lab3-tier1">Tier 1: PASS</span>
+      </div>
+    </div>
+    <h2>Kernel Trust &amp; <code>#print axioms</code> Taint DAG Inspector</h2>
+    <p>Toggle proof tactics and compiler attributes to see what enters <code>#print axioms</code>, which exploits hide outside <code>#print axioms</code>, and how <code>lake exe verigate</code> enforces Tier 0 vs. Tier 1 soundness.</p>
+    <div id="lab3-root">
+      <div class="lab-controls">
+        <label class="toggle-label"><input type="checkbox" id="lab3-core" checked disabled> Core Kernel (<code>rfl</code>/<code>omega</code>/<code>grind</code>)</label>
+        <label class="toggle-label"><input type="checkbox" id="lab3-classical" checked> Classical (<code>byContradiction</code>)</label>
+        <label class="toggle-label"><input type="checkbox" id="lab3-bv"> <code>bv_decide</code> (Verified LRAT)</label>
+        <label class="toggle-label"><input type="checkbox" id="lab3-native"> Raw <code>native_decide</code></label>
+        <label class="toggle-label"><input type="checkbox" id="lab3-axiom"> Custom <code>axiom</code></label>
+        <label class="toggle-label"><input type="checkbox" id="lab3-sorry"> <code>sorry</code></label>
+        <label class="toggle-label"><input type="checkbox" id="lab3-implby"> <code>@[implemented_by]</code></label>
+      </div>
+      <span class="infoview-section-label">Simulated Lean <code>#print axioms withdraw_safe</code> Output</span>
+      <div class="infoview-block" id="lab3-axioms-out"></div>
+      <div class="infoview-note" id="lab3-explain"></div>
+    </div>
+  </section>
+
+  <!-- LAB 4 -->
+  <section class="lab-card" id="lab-4">
+    <div class="prediction-header">
+      <span class="badge badge-accent">Lab 4 · Chapters 03 &amp; 09</span>
+      <span class="badge badge-verified" id="lab4-badge">Proof Erased to 0 Bytes</span>
+    </div>
+    <h2>Runtime Proof Erasure &amp; <code>Decidable</code> Bridge Inspector</h2>
+    <p>Adjust ring-buffer index, capacity, and RBAC role to compare the compile-time elaborated Lean kernel term (carrying proof witnesses) against the proof-erased LCNF / C representation emitted at runtime.</p>
+    <div class="lab-controls">
+      <label for="lab4-idx"><strong>Index:</strong></label>
+      <input type="number" id="lab4-idx" class="lab-input" value="5" min="0" max="999">
+      <label for="lab4-cap"><strong>Capacity:</strong></label>
+      <input type="number" id="lab4-cap" class="lab-input" value="16" min="1" max="999">
+      <label for="lab4-role"><strong>Role:</strong></label>
+      <select id="lab4-role" class="lab-select">
+        <option value="Admin">Admin</option>
+        <option value="Developer">Developer</option>
+        <option value="Guest">Guest</option>
+      </select>
+    </div>
+    <div class="lab-output-grid">
+      <div>
+        <span class="infoview-section-label">Compile-Time Kernel Term (With Proof Witnesses)</span>
+        <div class="infoview-block" id="lab4-elaborated"></div>
+      </div>
+      <div>
+        <span class="infoview-section-label">Compiled Runtime LCNF / C (Zero-Byte Proof Overhead)</span>
+        <div class="infoview-block" id="lab4-compiled"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAB 5 -->
+  <section class="lab-card" id="lab-5">
+    <div class="prediction-header">
+      <span class="badge badge-accent">Lab 5 · Chapters 01 &amp; 10</span>
+      <span class="badge badge-refuted" id="lab5-status">Divergence Check</span>
+    </div>
+    <h2>64-Bit <code>BitVec</code> Overflow vs. Mathematical <code>Nat</code> Truncation Explorer</h2>
+    <p>Compare unbounded/saturating <code>Nat</code> semantics against exact 64-bit hardware register arithmetic (<code>UInt64</code> / <code>BitVec 64</code>) across classic systems bugs.</p>
+    <div class="lab-controls">
+      <label for="lab5-preset"><strong>Bug Preset:</strong></label>
+      <select id="lab5-preset" class="lab-select">
+        <option value="underflow">0 - 1 (Nat Saturating 0 vs UInt64 Wrap)</option>
+        <option value="maxwrap">MAX_UINT64 + 1 (Epoch Counter Wrap)</option>
+        <option value="midpoint">(lo + hi) / 2 at 2^63 (Binary Search Midpoint Bug)</option>
+        <option value="escrow">Escrow Deposit Wrap (2^64 - 10 + 25)</option>
+      </select>
+      <input type="text" id="lab5-a" class="lab-input" value="0" aria-label="Operand A">
+      <select id="lab5-op" class="lab-select" aria-label="Operation">
+        <option value="sub" selected>a - b</option>
+        <option value="add">a + b</option>
+        <option value="mid">(a + b) / 2</option>
+      </select>
+      <input type="text" id="lab5-b" class="lab-input" value="1" aria-label="Operand B">
+    </div>
+    <div class="lab-output-grid">
+      <div class="infoview-block" id="lab5-nat"></div>
+      <div class="infoview-block" id="lab5-bv"></div>
+    </div>
+    <span class="infoview-section-label">64-Bit Hardware Register Bit-Strip (16 Hex Nibbles · Bit 63 → Bit 0)</span>
+    <div class="bit-strip" id="lab5-bits"></div>
+    <div class="infoview-note" id="lab5-note"></div>
+  </section>
+
+  <!-- LAB 6 -->
+  <section class="lab-card" id="lab-6">
+    <div class="prediction-header">
+      <span class="badge badge-accent">Lab 6 · Chapters 13–15 + CP4</span>
+      <span class="badge badge-open" id="lab6-score">0 / 5 exploits caught</span>
+    </div>
+    <h2>AI Spec-Gaming Red-Team Trap Detector</h2>
+    <p>Five autonomous coding-agent PRs compiled with zero <code>sorry</code>s. Inspect the submitted code and <code>#print axioms</code> output for each PR, and identify the exact exploit vector!</p>
+    <div class="lab-controls" id="lab6-tabs"></div>
+    <div class="lab-output-grid">
+      <div>
+        <span class="infoview-section-label">Untrusted Agent Submission</span>
+        <div class="infoview-block" id="lab6-code"></div>
+        <span class="infoview-section-label"><code>#print axioms</code> Output</span>
+        <div class="infoview-block" id="lab6-axioms"></div>
+      </div>
+      <div>
+        <span class="infoview-section-label">Classify the Exploit Vector</span>
+        <div class="prediction-options" id="lab6-choices"></div>
+        <div class="infoview-note" id="lab6-result">Inspect PR #101 and choose the exploit vector above.</div>
+      </div>
+    </div>
+  </section>
+</main>
+<div class="modal-backdrop" id="shortcut-modal" hidden role="dialog" aria-modal="true" aria-labelledby="shortcut-modal-title">
+  <div class="modal-dialog">
+    <div class="prediction-header">
+      <h3 id="shortcut-modal-title">Keyboard Shortcuts</h3>
+      <button type="button" class="btn btn-sm" data-action="close-shortcuts">Close (Esc)</button>
+    </div>
+    <div class="shortcut-row"><span>Step tactic forward in Infoview</span><kbd>j</kbd></div>
+    <div class="shortcut-row"><span>Step tactic backward in Infoview</span><kbd>k</kbd></div>
+    <div class="shortcut-row"><span>Previous unit / chapter</span><kbd>[</kbd></div>
+    <div class="shortcut-row"><span>Next unit / chapter</span><kbd>]</kbd></div>
+    <div class="shortcut-row"><span>Toggle Light / Dark theme</span><kbd>t</kbd></div>
+    <div class="shortcut-row"><span>Open or close this help dialog</span><kbd>?</kbd></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <strong>Indicogni LLC</strong> · <em>Prove It: Formally Verified Software in Lean 4</em><br>
+      Pinned to zero-dependency Core/<code>Std</code> Lean <code>v4.36.0</code>. Zero cookies, zero analytics, zero tracking.
+    </div>
+    <div>
+      Code: MIT · Prose &amp; SVG Diagrams: CC BY 4.0 · Feedback &amp; security: <code>feedback@indicogni.com</code><br>
+      <a href="https://github.com/indicogni/prove-it" target="_blank" rel="noopener noreferrer">github.com/indicogni/prove-it</a> ·
+      <a href="https://live.lean-lang.org/" target="_blank" rel="noopener noreferrer">live.lean-lang.org</a>
+    </div>
+  </div>
+</footer>
+  <script type="module" src="../assets/app.js"></script>
+  <script type="module" src="../assets/labs.js"></script>
+</body>
+</html>

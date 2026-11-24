@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Prove It — Pre-Commit Zero-PII & Git Identity Gate
+# Copyright (c) 2026 Indicogni LLC. MIT License.
+#
+# Enable once per clone with:
+#   git config core.hooksPath .githooks
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+EXPECTED_IDENT="Indicogni LLC <noreply@indicogni.com>"
+
+check_ident() {
+  local var_name="$1"
+  local raw_ident
+  raw_ident="$(git var "$var_name")"
+  local name_email="${raw_ident%%>*}>"
+  if [[ "$name_email" != "$EXPECTED_IDENT" ]]; then
+    echo "ERROR: $var_name is '$name_email' but must be '$EXPECTED_IDENT'." >&2
+    echo "Configure repository-local git identity before committing:" >&2
+    echo "  git config user.name 'Indicogni LLC'" >&2
+    echo "  git config user.email 'noreply@indicogni.com'" >&2
+    exit 1
+  fi
+}
+
+check_ident GIT_AUTHOR_IDENT
+check_ident GIT_COMMITTER_IDENT
+
+python3 "$REPO_ROOT/scripts/audit_security.py" --root "$REPO_ROOT" --check-staged-ident

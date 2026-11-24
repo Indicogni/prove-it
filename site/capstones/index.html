@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';">
+  <meta name="referrer" content="no-referrer">
+  <title>4 Production Capstones — Prove It (Indicogni)</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand-link" href="../index.html">
+      <span class="brand-org">indicogni</span>
+      <span class="brand-sep">/</span>
+      <span class="brand-title">Prove It</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="../index.html#curriculum">Curriculum</a>
+      <a class="nav-link" href="../labs/index.html">6 Live Labs</a>
+      <a class="nav-link" href="../capstones/index.html" aria-current="page">4 Capstones</a>
+      <a class="nav-link" href="../reference/tla-to-lean.html">TLA+ ↔ Lean</a>
+      <a class="nav-link" href="../reference/ai-playbook.html">AI Playbook</a>
+      <a class="nav-link" href="../reference/glossary.html">Glossary</a>
+    </nav>
+    <div class="nav-controls">
+      <span class="progress-pill" data-progress-summary>0/20 units · 0/6 labs</span>
+      <button type="button" class="icon-btn" data-action="open-shortcuts" title="Keyboard shortcuts (?)">Shortcuts (?)</button>
+      <button type="button" class="icon-btn" data-action="toggle-theme">Dark theme (t)</button>
+    </div>
+  </div>
+</header>
+<main class="container-wide">
+  <span class="eyebrow">Industrial Verification Suites</span>
+  <h1>The 4 Production Capstones</h1>
+  <p class="hero-subtitle">
+    Move beyond toy exercises into four real-world verification domains: cloud IAM authorization, distributed split-brain lease storage, optimizing bytecode compilation, and proof-carrying AI supervision + polyglot differential fuzzing.
+  </p>
+  <p>
+    Each capstone ships with a starter specification in <code>ProveIt/Capstones/</code>, architectural notes in <code>capstones/*/README.md</code>, and a 100% zero-<code>sorry</code> verified solution in <code>Solutions/Capstones/</code>. Every standalone preview below compiles directly in <a href="https://live.lean-lang.org/" target="_blank" rel="noopener noreferrer">live.lean-lang.org</a>.
+  </p>
+  <section class="lab-card" id="cedar-lite">
+    <div class="prediction-header">
+      <span class="badge badge-accent">Capstone 01 · Cloud Security</span>
+      <code>ProveIt/Capstones/CedarLite.lean</code>
+    </div>
+    <h2>CedarLite — Cloud IAM Policy Engine &amp; Optimizer</h2>
+    <p>Inspired by AWS&#x27;s Lean-verified Cedar authorization engine. Model principals, actions, resources, and `permit`/`forbid` policy sets, then build a policy constant-folder/dead-rule eliminator and prove three non-negotiable security theorems.</p>
+    <h3>Core Theorems &amp; Engineering Guarantees</h3>
+    <ul><li>Default-Deny: An empty policy set denies every `(Principal, Action, Resource)` request.</li><li>Forbid-Overrides-Permit: If ANY matching `forbid` rule fires, `authorize` returns `.deny` regardless of how many `permit` rules match.</li><li>Optimizer Equivalence: `authorize (optimizePolicies ps) req = authorize ps req` for all requests.</li></ul>
+    <h3>Self-Contained Verified Preview (Lean 4.36.0)</h3>
+    <pre><code id="cap-code-1">-- Capstone 1 Preview: CedarLite Authorization &amp; Forbid-Overrides-Permit
+inductive Effect | permit | forbid deriving Repr, DecidableEq
+inductive Decision | allow | deny deriving Repr, DecidableEq
+
+structure Request where
+  principal : Nat
+  action    : Nat
+  resource  : Nat
+  deriving DecidableEq
+
+structure Rule where
+  effect : Effect
+  targetPrincipal : Option Nat -- none = wildcard *
+  targetAction    : Option Nat
+
+def matchesRule (r : Rule) (req : Request) : Bool :=
+  (match r.targetPrincipal with | none =&gt; true | some p =&gt; p == req.principal) &amp;&amp;
+  (match r.targetAction    with | none =&gt; true | some a =&gt; a == req.action)
+
+def authorize (rules : List Rule) (req : Request) : Decision :=
+  let active := rules.filter (fun r =&gt; matchesRule r req)
+  if active.any (fun r =&gt; r.effect == .forbid) then .deny
+  else if active.any (fun r =&gt; r.effect == .permit) then .allow
+  else .deny
+
+theorem default_deny (req : Request) : authorize [] req = .deny := rfl
+
+theorem explicit_forbid_wins (r : Rule) (rest : List Rule) (req : Request)
+    (h_forbid : r.effect = .forbid) (h_match : matchesRule r req = true) :
+    authorize (r :: rest) req = .deny := by
+  unfold authorize
+  simp only [List.filter, h_match, ↓reduceIte, List.any_cons, h_forbid, BEq.rfl, Bool.true_or]
+</code></pre>
+    <div class="action-group">
+      <a class="btn btn-primary btn-sm" href="https://live.lean-lang.org/#code=--%20Capstone%201%20Preview%3A%20CedarLite%20Authorization%20%26%20Forbid-Overrides-Permit%0Ainductive%20Effect%20%7C%20permit%20%7C%20forbid%20deriving%20Repr%2C%20DecidableEq%0Ainductive%20Decision%20%7C%20allow%20%7C%20deny%20deriving%20Repr%2C%20DecidableEq%0A%0Astructure%20Request%20where%0A%20%20principal%20%3A%20Nat%0A%20%20action%20%20%20%20%3A%20Nat%0A%20%20resource%20%20%3A%20Nat%0A%20%20deriving%20DecidableEq%0A%0Astructure%20Rule%20where%0A%20%20effect%20%3A%20Effect%0A%20%20targetPrincipal%20%3A%20Option%20Nat%20--%20none%20%3D%20wildcard%20%2A%0A%20%20targetAction%20%20%20%20%3A%20Option%20Nat%0A%0Adef%20matchesRule%20%28r%20%3A%20Rule%29%20%28req%20%3A%20Request%29%20%3A%20Bool%20%3A%3D%0A%20%20%28match%20r.targetPrincipal%20with%20%7C%20none%20%3D%3E%20true%20%7C%20some%20p%20%3D%3E%20p%20%3D%3D%20req.principal%29%20%26%26%0A%20%20%28match%20r.targetAction%20%20%20%20with%20%7C%20none%20%3D%3E%20true%20%7C%20some%20a%20%3D%3E%20a%20%3D%3D%20req.action%29%0A%0Adef%20authorize%20%28rules%20%3A%20List%20Rule%29%20%28req%20%3A%20Request%29%20%3A%20Decision%20%3A%3D%0A%20%20let%20active%20%3A%3D%20rules.filter%20%28fun%20r%20%3D%3E%20matchesRule%20r%20req%29%0A%20%20if%20active.any%20%28fun%20r%20%3D%3E%20r.effect%20%3D%3D%20.forbid%29%20then%20.deny%0A%20%20else%20if%20active.any%20%28fun%20r%20%3D%3E%20r.effect%20%3D%3D%20.permit%29%20then%20.allow%0A%20%20else%20.deny%0A%0Atheorem%20default_deny%20%28req%20%3A%20Request%29%20%3A%20authorize%20%5B%5D%20req%20%3D%20.deny%20%3A%3D%20rfl%0A%0Atheorem%20explicit_forbid_wins%20%28r%20%3A%20Rule%29%20%28rest%20%3A%20List%20Rule%29%20%28req%20%3A%20Request%29%0A%20%20%20%20%28h_forbid%20%3A%20r.effect%20%3D%20.forbid%29%20%28h_match%20%3A%20matchesRule%20r%20req%20%3D%20true%29%20%3A%0A%20%20%20%20authorize%20%28r%20%3A%3A%20rest%29%20req%20%3D%20.deny%20%3A%3D%20by%0A%20%20unfold%20authorize%0A%20%20simp%20only%20%5BList.filter%2C%20h_match%2C%20%E2%86%93reduceIte%2C%20List.any_cons%2C%20h_forbid%2C%20BEq.rfl%2C%20Bool.true_or%5D%0A" target="_blank" rel="noopener noreferrer">Run Capstone Slice in Lean 4 Playground ↗</a>
+      <button type="button" class="btn btn-sm" data-copy-target="cap-code-1">Copy Lean preview</button>
+      <button type="button" class="btn btn-sm" data-copy-text="lake build ProveIt.Capstones.CedarLite">Copy local command: <code>lake build ProveIt.Capstones.CedarLite</code></button>
+    </div>
+  </section>
+  <section class="lab-card" id="fencing-kv">
+    <div class="prediction-header">
+      <span class="badge badge-accent">Capstone 02 · Distributed Systems</span>
+      <code>ProveIt/Capstones/FencingKV.lean</code>
+    </div>
+    <h2>FencingKV — Split-Brain Leases &amp; Tombstone Compaction</h2>
+    <p>Full Two-Gear TLA+-in-Lean distributed verification: use Gear 1 BFS to reproduce a GC-pause split-brain write on unfenced storage, then prove Gear 2 unbounded inductive epoch monotonicity AND tombstone-compaction refinement.</p>
+    <h3>Core Theorems &amp; Engineering Guarantees</h3>
+    <ul><li>Gear 1 Falsification: Unfenced delayed leader writes corrupt newer epoch commits in 4 steps.</li><li>Gear 2 Monotonic Fencing: `msg.epoch &lt; node.fencedEpoch` is rejected across all unbounded `epoch : Nat`.</li><li>Stuttering Compaction: Garbage-collecting shadowed writes and tombstones preserves logical key reads.</li></ul>
+    <h3>Self-Contained Verified Preview (Lean 4.36.0)</h3>
+    <pre><code id="cap-code-2">-- Capstone 2 Preview: FencingKV Monotonic Token Guard
+structure StorageNode where
+  fencedEpoch : Nat
+  val         : Nat
+  deriving Repr, DecidableEq
+
+def writeFenced (node : StorageNode) (msgEpoch msgVal : Nat) : StorageNode :=
+  if msgEpoch ≥ node.fencedEpoch then
+    { fencedEpoch := msgEpoch, val := msgVal }
+  else node
+
+theorem fenced_epoch_monotonic (node : StorageNode) (ep v : Nat) :
+    node.fencedEpoch ≤ (writeFenced node ep v).fencedEpoch := by
+  unfold writeFenced
+  split &lt;;&gt; omega
+
+theorem stale_epoch_ignored (node : StorageNode) (ep v : Nat)
+    (h_stale : ep &lt; node.fencedEpoch) :
+    writeFenced node ep v = node := by
+  unfold writeFenced
+  have h_not : ¬(ep ≥ node.fencedEpoch) := by omega
+  simp only [h_not, ↓reduceIte]
+</code></pre>
+    <div class="action-group">
+      <a class="btn btn-primary btn-sm" href="https://live.lean-lang.org/#code=--%20Capstone%202%20Preview%3A%20FencingKV%20Monotonic%20Token%20Guard%0Astructure%20StorageNode%20where%0A%20%20fencedEpoch%20%3A%20Nat%0A%20%20val%20%20%20%20%20%20%20%20%20%3A%20Nat%0A%20%20deriving%20Repr%2C%20DecidableEq%0A%0Adef%20writeFenced%20%28node%20%3A%20StorageNode%29%20%28msgEpoch%20msgVal%20%3A%20Nat%29%20%3A%20StorageNode%20%3A%3D%0A%20%20if%20msgEpoch%20%E2%89%A5%20node.fencedEpoch%20then%0A%20%20%20%20%7B%20fencedEpoch%20%3A%3D%20msgEpoch%2C%20val%20%3A%3D%20msgVal%20%7D%0A%20%20else%20node%0A%0Atheorem%20fenced_epoch_monotonic%20%28node%20%3A%20StorageNode%29%20%28ep%20v%20%3A%20Nat%29%20%3A%0A%20%20%20%20node.fencedEpoch%20%E2%89%A4%20%28writeFenced%20node%20ep%20v%29.fencedEpoch%20%3A%3D%20by%0A%20%20unfold%20writeFenced%0A%20%20split%20%3C%3B%3E%20omega%0A%0Atheorem%20stale_epoch_ignored%20%28node%20%3A%20StorageNode%29%20%28ep%20v%20%3A%20Nat%29%0A%20%20%20%20%28h_stale%20%3A%20ep%20%3C%20node.fencedEpoch%29%20%3A%0A%20%20%20%20writeFenced%20node%20ep%20v%20%3D%20node%20%3A%3D%20by%0A%20%20unfold%20writeFenced%0A%20%20have%20h_not%20%3A%20%C2%AC%28ep%20%E2%89%A5%20node.fencedEpoch%29%20%3A%3D%20by%20omega%0A%20%20simp%20only%20%5Bh_not%2C%20%E2%86%93reduceIte%5D%0A" target="_blank" rel="noopener noreferrer">Run Capstone Slice in Lean 4 Playground ↗</a>
+      <button type="button" class="btn btn-sm" data-copy-target="cap-code-2">Copy Lean preview</button>
+      <button type="button" class="btn btn-sm" data-copy-text="lake build ProveIt.Capstones.FencingKV">Copy local command: <code>lake build ProveIt.Capstones.FencingKV</code></button>
+    </div>
+  </section>
+  <section class="lab-card" id="stack-vm">
+    <div class="prediction-header">
+      <span class="badge badge-accent">Capstone 03 · Compilers &amp; Runtimes</span>
+      <code>ProveIt/Capstones/StackVM.lean</code>
+    </div>
+    <h2>StackVM — Verified Optimizing Compiler &amp; Bytecode VM</h2>
+    <p>Compile an expression AST with variables, arithmetic, and conditionals into flat stack-machine bytecode, write an algebraic constant-folding optimizer, and prove end-to-end semantic preservation for arbitrary code continuations.</p>
+    <h3>Core Theorems &amp; Engineering Guarantees</h3>
+    <ul><li>Optimizer Soundness: `eval env (optimize e) = eval env e`.</li><li>Continuation-Safe Stack Preservation: `exec env (compile e ++ codeRest) stk = exec env codeRest (eval env e :: stk)`.</li><li>Zero Stack-Underflow Guarantee: Compiled programs never trap on an empty operand stack.</li></ul>
+    <h3>Self-Contained Verified Preview (Lean 4.36.0)</h3>
+    <pre><code id="cap-code-3">-- Capstone 3 Preview: StackVM Compiler Continuation Preservation
+inductive Expr
+  | lit (n : Nat)
+  | var (x : Nat)
+  | add (a b : Expr)
+
+def eval (env : Nat → Nat) : Expr → Nat
+  | .lit n   =&gt; n
+  | .var x   =&gt; env x
+  | .add a b =&gt; eval env a + eval env b
+
+inductive Instr | push (n : Nat) | load (x : Nat) | iadd
+
+def compile : Expr → List Instr
+  | .lit n   =&gt; [.push n]
+  | .var x   =&gt; [.load x]
+  | .add a b =&gt; compile a ++ compile b ++ [.iadd]
+
+def exec (env : Nat → Nat) : List Instr → List Nat → Option (List Nat)
+  | [], stk =&gt; some stk
+  | .push n :: rest, stk =&gt; exec env rest (n :: stk)
+  | .load x :: rest, stk =&gt; exec env rest (env x :: stk)
+  | .iadd :: rest, b :: a :: stk =&gt; exec env rest ((a + b) :: stk)
+  | .iadd :: _, _ =&gt; none
+
+theorem compile_correct (env : Nat → Nat) (e : Expr) (rest : List Instr) (stk : List Nat) :
+    exec env (compile e ++ rest) stk = exec env rest (eval env e :: stk) := by
+  induction e generalizing rest stk with
+  | lit n =&gt; rfl
+  | var x =&gt; rfl
+  | add a b iha ihb =&gt;
+    simp only [compile, List.append_assoc, iha, ihb, eval]
+    rfl
+</code></pre>
+    <div class="action-group">
+      <a class="btn btn-primary btn-sm" href="https://live.lean-lang.org/#code=--%20Capstone%203%20Preview%3A%20StackVM%20Compiler%20Continuation%20Preservation%0Ainductive%20Expr%0A%20%20%7C%20lit%20%28n%20%3A%20Nat%29%0A%20%20%7C%20var%20%28x%20%3A%20Nat%29%0A%20%20%7C%20add%20%28a%20b%20%3A%20Expr%29%0A%0Adef%20eval%20%28env%20%3A%20Nat%20%E2%86%92%20Nat%29%20%3A%20Expr%20%E2%86%92%20Nat%0A%20%20%7C%20.lit%20n%20%20%20%3D%3E%20n%0A%20%20%7C%20.var%20x%20%20%20%3D%3E%20env%20x%0A%20%20%7C%20.add%20a%20b%20%3D%3E%20eval%20env%20a%20%2B%20eval%20env%20b%0A%0Ainductive%20Instr%20%7C%20push%20%28n%20%3A%20Nat%29%20%7C%20load%20%28x%20%3A%20Nat%29%20%7C%20iadd%0A%0Adef%20compile%20%3A%20Expr%20%E2%86%92%20List%20Instr%0A%20%20%7C%20.lit%20n%20%20%20%3D%3E%20%5B.push%20n%5D%0A%20%20%7C%20.var%20x%20%20%20%3D%3E%20%5B.load%20x%5D%0A%20%20%7C%20.add%20a%20b%20%3D%3E%20compile%20a%20%2B%2B%20compile%20b%20%2B%2B%20%5B.iadd%5D%0A%0Adef%20exec%20%28env%20%3A%20Nat%20%E2%86%92%20Nat%29%20%3A%20List%20Instr%20%E2%86%92%20List%20Nat%20%E2%86%92%20Option%20%28List%20Nat%29%0A%20%20%7C%20%5B%5D%2C%20stk%20%3D%3E%20some%20stk%0A%20%20%7C%20.push%20n%20%3A%3A%20rest%2C%20stk%20%3D%3E%20exec%20env%20rest%20%28n%20%3A%3A%20stk%29%0A%20%20%7C%20.load%20x%20%3A%3A%20rest%2C%20stk%20%3D%3E%20exec%20env%20rest%20%28env%20x%20%3A%3A%20stk%29%0A%20%20%7C%20.iadd%20%3A%3A%20rest%2C%20b%20%3A%3A%20a%20%3A%3A%20stk%20%3D%3E%20exec%20env%20rest%20%28%28a%20%2B%20b%29%20%3A%3A%20stk%29%0A%20%20%7C%20.iadd%20%3A%3A%20_%2C%20_%20%3D%3E%20none%0A%0Atheorem%20compile_correct%20%28env%20%3A%20Nat%20%E2%86%92%20Nat%29%20%28e%20%3A%20Expr%29%20%28rest%20%3A%20List%20Instr%29%20%28stk%20%3A%20List%20Nat%29%20%3A%0A%20%20%20%20exec%20env%20%28compile%20e%20%2B%2B%20rest%29%20stk%20%3D%20exec%20env%20rest%20%28eval%20env%20e%20%3A%3A%20stk%29%20%3A%3D%20by%0A%20%20induction%20e%20generalizing%20rest%20stk%20with%0A%20%20%7C%20lit%20n%20%3D%3E%20rfl%0A%20%20%7C%20var%20x%20%3D%3E%20rfl%0A%20%20%7C%20add%20a%20b%20iha%20ihb%20%3D%3E%0A%20%20%20%20simp%20only%20%5Bcompile%2C%20List.append_assoc%2C%20iha%2C%20ihb%2C%20eval%5D%0A%20%20%20%20rfl%0A" target="_blank" rel="noopener noreferrer">Run Capstone Slice in Lean 4 Playground ↗</a>
+      <button type="button" class="btn btn-sm" data-copy-target="cap-code-3">Copy Lean preview</button>
+      <button type="button" class="btn btn-sm" data-copy-text="lake build ProveIt.Capstones.StackVM">Copy local command: <code>lake build ProveIt.Capstones.StackVM</code></button>
+    </div>
+  </section>
+  <section class="lab-card" id="verigate-oracle">
+    <div class="prediction-header">
+      <span class="badge badge-accent">Capstone 04 · AI Safety &amp; Polyglot CI</span>
+      <code>ProveIt/Capstones/VeriGate.lean</code>
+    </div>
+    <h2>VeriGate &amp; Oracle — AI Proof-Carrying Gate &amp; Differential Fuzzer</h2>
+    <p>Build the supervision harness that lets autonomous coding agents write fast implementations without compromising soundness: lock `Spec` hashes, audit axioms/attributes against `RedTeam/` exploits, and differential-fuzz external services.</p>
+    <h3>Core Theorems &amp; Engineering Guarantees</h3>
+    <ul><li>Two-Tier Axiom Policy: Strict Tier 0 (`propext`, `Quot.sound`, `Classical.choice`) + explicit Tier 1 (`bv_decide` without raw `native_decide`).</li><li>Attribute &amp; Spec-Drift Firewall: Blocks `sorryAx`, custom `axiom`, `@[implemented_by]`, `@[extern]`, `@[csimp]`, and `Spec.lean` edits.</li><li>Polyglot Differential Oracle (`lake exe oracle`): Streams ground-truth outputs to test Rust, Go, TS, and Python services.</li></ul>
+    <h3>Self-Contained Verified Preview (Lean 4.36.0)</h3>
+    <pre><code id="cap-code-4">-- Capstone 4 Preview: Pure Axiom-Policy Classifier Model
+inductive TrustTier | strictKernel | bvLrat deriving DecidableEq
+
+structure AuditInput where
+  axiomsUsed      : List String
+  hasRawNativeDec : Bool
+  hasRuntimeSwap  : Bool -- @[implemented_by] / @[extern] / @[csimp]
+  specHashMatches : Bool
+  hasNonVacuity   : Bool
+
+def allowedAxiom (tier : TrustTier) (ax : String) : Bool :=
+  ax == &quot;propext&quot; || ax == &quot;Quot.sound&quot; || ax == &quot;Classical.choice&quot; ||
+  (tier == .bvLrat &amp;&amp; (ax == &quot;Lean.ofReduceBool&quot; || ax == &quot;Lean.trustCompiler&quot;))
+
+def verigatePass (tier : TrustTier) (inp : AuditInput) : Bool :=
+  inp.specHashMatches &amp;&amp;
+  inp.hasNonVacuity &amp;&amp;
+  !inp.hasRuntimeSwap &amp;&amp;
+  !inp.hasRawNativeDec &amp;&amp;
+  inp.axiomsUsed.all (allowedAxiom tier)
+
+theorem sorry_always_rejected (tier : TrustTier) (inp : AuditInput)
+    (h : &quot;sorryAx&quot; ∈ inp.axiomsUsed) : verigatePass tier inp = false := by
+  unfold verigatePass
+  have hall : inp.axiomsUsed.all (allowedAxiom tier) = false := by
+    rw [List.all_eq_false]
+    refine ⟨&quot;sorryAx&quot;, h, ?_⟩
+    cases tier &lt;;&gt; decide
+  simp only [hall, Bool.and_false]
+</code></pre>
+    <div class="action-group">
+      <a class="btn btn-primary btn-sm" href="https://live.lean-lang.org/#code=--%20Capstone%204%20Preview%3A%20Pure%20Axiom-Policy%20Classifier%20Model%0Ainductive%20TrustTier%20%7C%20strictKernel%20%7C%20bvLrat%20deriving%20DecidableEq%0A%0Astructure%20AuditInput%20where%0A%20%20axiomsUsed%20%20%20%20%20%20%3A%20List%20String%0A%20%20hasRawNativeDec%20%3A%20Bool%0A%20%20hasRuntimeSwap%20%20%3A%20Bool%20--%20%40%5Bimplemented_by%5D%20%2F%20%40%5Bextern%5D%20%2F%20%40%5Bcsimp%5D%0A%20%20specHashMatches%20%3A%20Bool%0A%20%20hasNonVacuity%20%20%20%3A%20Bool%0A%0Adef%20allowedAxiom%20%28tier%20%3A%20TrustTier%29%20%28ax%20%3A%20String%29%20%3A%20Bool%20%3A%3D%0A%20%20ax%20%3D%3D%20%22propext%22%20%7C%7C%20ax%20%3D%3D%20%22Quot.sound%22%20%7C%7C%20ax%20%3D%3D%20%22Classical.choice%22%20%7C%7C%0A%20%20%28tier%20%3D%3D%20.bvLrat%20%26%26%20%28ax%20%3D%3D%20%22Lean.ofReduceBool%22%20%7C%7C%20ax%20%3D%3D%20%22Lean.trustCompiler%22%29%29%0A%0Adef%20verigatePass%20%28tier%20%3A%20TrustTier%29%20%28inp%20%3A%20AuditInput%29%20%3A%20Bool%20%3A%3D%0A%20%20inp.specHashMatches%20%26%26%0A%20%20inp.hasNonVacuity%20%26%26%0A%20%20%21inp.hasRuntimeSwap%20%26%26%0A%20%20%21inp.hasRawNativeDec%20%26%26%0A%20%20inp.axiomsUsed.all%20%28allowedAxiom%20tier%29%0A%0Atheorem%20sorry_always_rejected%20%28tier%20%3A%20TrustTier%29%20%28inp%20%3A%20AuditInput%29%0A%20%20%20%20%28h%20%3A%20%22sorryAx%22%20%E2%88%88%20inp.axiomsUsed%29%20%3A%20verigatePass%20tier%20inp%20%3D%20false%20%3A%3D%20by%0A%20%20unfold%20verigatePass%0A%20%20have%20hall%20%3A%20inp.axiomsUsed.all%20%28allowedAxiom%20tier%29%20%3D%20false%20%3A%3D%20by%0A%20%20%20%20rw%20%5BList.all_eq_false%5D%0A%20%20%20%20refine%20%E2%9F%A8%22sorryAx%22%2C%20h%2C%20%3F_%E2%9F%A9%0A%20%20%20%20cases%20tier%20%3C%3B%3E%20decide%0A%20%20simp%20only%20%5Bhall%2C%20Bool.and_false%5D%0A" target="_blank" rel="noopener noreferrer">Run Capstone Slice in Lean 4 Playground ↗</a>
+      <button type="button" class="btn btn-sm" data-copy-target="cap-code-4">Copy Lean preview</button>
+      <button type="button" class="btn btn-sm" data-copy-text="lake exe verigate --self-test &amp;&amp; lake exe oracle --demo">Copy local command: <code>lake exe verigate --self-test &amp;&amp; lake exe oracle --demo</code></button>
+    </div>
+  </section>
+
+</main>
+<div class="modal-backdrop" id="shortcut-modal" hidden role="dialog" aria-modal="true" aria-labelledby="shortcut-modal-title">
+  <div class="modal-dialog">
+    <div class="prediction-header">
+      <h3 id="shortcut-modal-title">Keyboard Shortcuts</h3>
+      <button type="button" class="btn btn-sm" data-action="close-shortcuts">Close (Esc)</button>
+    </div>
+    <div class="shortcut-row"><span>Step tactic forward in Infoview</span><kbd>j</kbd></div>
+    <div class="shortcut-row"><span>Step tactic backward in Infoview</span><kbd>k</kbd></div>
+    <div class="shortcut-row"><span>Previous unit / chapter</span><kbd>[</kbd></div>
+    <div class="shortcut-row"><span>Next unit / chapter</span><kbd>]</kbd></div>
+    <div class="shortcut-row"><span>Toggle Light / Dark theme</span><kbd>t</kbd></div>
+    <div class="shortcut-row"><span>Open or close this help dialog</span><kbd>?</kbd></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <strong>Indicogni LLC</strong> · <em>Prove It: Formally Verified Software in Lean 4</em><br>
+      Pinned to zero-dependency Core/<code>Std</code> Lean <code>v4.36.0</code>. Zero cookies, zero analytics, zero tracking.
+    </div>
+    <div>
+      Code: MIT · Prose &amp; SVG Diagrams: CC BY 4.0 · Feedback &amp; security: <code>feedback@indicogni.com</code><br>
+      <a href="https://github.com/indicogni/prove-it" target="_blank" rel="noopener noreferrer">github.com/indicogni/prove-it</a> ·
+      <a href="https://live.lean-lang.org/" target="_blank" rel="noopener noreferrer">live.lean-lang.org</a>
+    </div>
+  </div>
+</footer>
+  <script type="module" src="../assets/app.js"></script>
+  <script type="module" src="../assets/reference.js"></script>
+</body>
+</html>

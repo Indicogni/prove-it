@@ -1,0 +1,29 @@
+name = "prove_it"
+version = "0.1.0"
+defaultTargets = ["ProveIt", "Solutions", "check", "verigate", "oracle"]
+
+[leanOptions]
+autoImplicit = false
+
+[[lean_lib]]
+name = "ProveIt"
+
+[[lean_lib]]
+name = "Solutions"
+
+[[lean_lib]]
+name = "RedTeam"
+
+[[lean_exe]]
+name = "check"
+root = "Tools.Check"
+supportInterpreter = true
+
+[[lean_exe]]
+name = "verigate"
+root = "Tools.VeriGate"
+supportInterpreter = true
+
+[[lean_exe]]
+name = "oracle"
+root = "Tools.Oracle"

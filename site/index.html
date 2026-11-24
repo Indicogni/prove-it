@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';">
+  <meta name="referrer" content="no-referrer">
+  <title>Formally Verified Software in Lean 4 — Prove It (Indicogni)</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand-link" href="index.html">
+      <span class="brand-org">indicogni</span>
+      <span class="brand-sep">/</span>
+      <span class="brand-title">Prove It</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="index.html#curriculum" aria-current="page">Curriculum</a>
+      <a class="nav-link" href="labs/index.html">6 Live Labs</a>
+      <a class="nav-link" href="capstones/index.html">4 Capstones</a>
+      <a class="nav-link" href="reference/tla-to-lean.html">TLA+ ↔ Lean</a>
+      <a class="nav-link" href="reference/ai-playbook.html">AI Playbook</a>
+      <a class="nav-link" href="reference/glossary.html">Glossary</a>
+    </nav>
+    <div class="nav-controls">
+      <span class="progress-pill" data-progress-summary>0/20 units · 0/6 labs</span>
+      <button type="button" class="icon-btn" data-action="open-shortcuts" title="Keyboard shortcuts (?)">Shortcuts (?)</button>
+      <button type="button" class="icon-btn" data-action="toggle-theme">Dark theme (t)</button>
+    </div>
+  </div>
+</header>
+<main class="container-wide">
+  <section class="resume-banner" id="resume-banner" hidden aria-label="Course progress">
+    <div class="resume-meta">
+      <span class="resume-eyebrow">Continue where you left off</span>
+      <strong id="resume-title">Chapter 01 · Silent Truncation Bug</strong>
+    </div>
+    <div class="resume-actions">
+      <a class="btn btn-sm btn-primary" id="resume-link" href="chapters/01.html">Resume unit →</a>
+      <button type="button" class="btn btn-sm" data-action="export-progress">Export progress JSON</button>
+      <button type="button" class="btn btn-sm btn-danger" data-action="reset-progress">Reset progress</button>
+    </div>
+  </section>
+
+  <section class="hero">
+    <span class="eyebrow">Indicogni Interactive Engineering Course · Lean 4.36.0</span>
+    <h1 class="hero-title">Don't hope the AI's code works. <em>Prove</em> it.</h1>
+    <p class="hero-subtitle">
+      A hands-on software and distributed-systems verification course for working engineers. Skip Peano arithmetic warmups and multi-gigabyte library downloads: catch protocol bugs with a 35-line TLA+ state explorer, seal 64-bit hardware invariants in Lean's kernel, audit untrusted AI code with <code>verigate</code>, and differential-fuzz Rust/Go/TS services against <code>oracle</code>.
+    </p>
+    <div class="hero-cta-row">
+      <a class="btn btn-primary" href="chapters/01.html">Start Chapter 01: Silent Truncation →</a>
+      <a class="btn" href="labs/index.html">Explore 6 Live Browser Labs</a>
+      <a class="btn" href="capstones/index.html">View 4 Capstones</a>
+      <a class="btn" href="https://github.com/indicogni/prove-it" target="_blank" rel="noopener noreferrer">GitHub Workspace ↗</a>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-card">
+        <span class="stat-value">16 chapters</span>
+        <span class="stat-label">+ 4 closed-notes synthesis checkpoints</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">4 capstones</span>
+        <span class="stat-label">CedarLite, FencingKV, StackVM, VeriGate</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">6 live labs</span>
+        <span class="stat-label">Zero-install BFS, BitVec, Erasure &amp; Red-Team</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">$0 / Zero tracking</span>
+        <span class="stat-label">No cookies, no telemetry, offline-ready</span>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="dual-mode-heading">
+    <h2 id="dual-mode-heading">Dual-Mode Learning: Zero-Setup Browser + Full Local Lake Toolchain</h2>
+    <div class="grid-2">
+      <div class="card card-elevated">
+        <span class="badge badge-verified">Mode 1 · Runs in your browser</span>
+        <h3>Zero Install, Instant Proof Intuition</h3>
+        <p>
+          Every chapter opens with a concrete 5-line production bug, locks your Socratic prediction before revealing the mechanism, lets you step line-by-line through a simulated <strong>Lean 4 Infoview</strong> (<kbd>j</kbd> / <kbd>k</kbd>), and launches standalone zero-dependency code in one click on <a href="https://live.lean-lang.org/" target="_blank" rel="noopener noreferrer">live.lean-lang.org</a>.
+        </p>
+        <a class="btn btn-sm" href="labs/index.html">Open Browser Labs →</a>
+      </div>
+      <div class="card card-elevated">
+        <span class="badge badge-accent">Mode 2 · Your machine or Codespaces</span>
+        <h3>Production Proof Engineering &amp; CI Gates</h3>
+        <p>
+          Clone <a href="https://github.com/indicogni/prove-it" target="_blank" rel="noopener noreferrer">indicogni/prove-it</a> or launch GitHub Codespaces. Because we pin pure Core/<code>Std</code> Lean <code>v4.36.0</code> with zero external packages, cold <code>lake build</code> finishes in seconds offline—complete with <code>lake exe check</code>, <code>lake exe verigate</code>, and <code>lake exe oracle</code>.
+        </p>
+        <button type="button" class="btn btn-sm" data-copy-text="git clone https://github.com/indicogni/prove-it.git && cd prove-it && lake build">Copy clone &amp; build command</button>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="arch-heading">
+    <h2 id="arch-heading">How Systems Verification &amp; AI Supervision Fit Together</h2>
+    <figure class="diagram-figure">
+  <svg class="diagram-svg" viewBox="0 0 920 270" role="img" aria-labelledby="svg-twogear-title svg-twogear-desc">
+    <title id="svg-twogear-title">The Two-Gear Verification Loop: TLA+ Bounded BFS and Lean 4 Kernel Proof</title>
+    <desc id="svg-twogear-desc">System state machine flows into Gear 1 bounded BFS search to catch shallow counterexample traces in milliseconds, then into Gear 2 inductive invariants in the Lean 4 kernel to seal unbounded state spaces.</desc>
+    <defs>
+      <marker id="arrow-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 10 5 L 0 9 z" class="svg-head-muted"/>
+      </marker>
+      <marker id="arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 10 5 L 0 9 z" class="svg-head-accent"/>
+      </marker>
+      <marker id="arrow-verified" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 10 5 L 0 9 z" class="svg-head-verified"/>
+      </marker>
+      <marker id="arrow-refuted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 10 5 L 0 9 z" class="svg-head-refuted"/>
+      </marker>
+    </defs>
+
+    <rect x="16" y="42" width="210" height="175" rx="10" class="svg-box"/>
+    <text x="34" y="72" class="svg-title">1. Executable Spec</text>
+    <text x="34" y="98" class="svg-mono-ink">State · Init · Next</text>
+    <text x="34" y="122" class="svg-mono">Total functions (no null)</text>
+    <text x="34" y="144" class="svg-mono">Sum types eliminate</text>
+    <text x="34" y="162" class="svg-mono">boolean-soup states</text>
+    <text x="34" y="192" class="svg-mono-ink">Chapters 01–03</text>
+
+    <path d="M 226 115 L 288 115" class="svg-arrow-accent" marker-end="url(#arrow-accent)"/>
+
+    <rect x="292" y="26" width="275" height="132" rx="10" class="svg-box-open"/>
+    <text x="312" y="55" class="svg-title">2. Gear 1 · TLA+ BFS Search</text>
+    <text x="312" y="80" class="svg-mono-ink">#guard bfs depth≤6 == .safe</text>
+    <text x="312" y="103" class="svg-mono">Explores packet delays, crashes,</text>
+    <text x="312" y="121" class="svg-mono">&amp; interleavings in &lt;5 ms</text>
+    <text x="312" y="144" class="svg-mono-ink">Chapter 04 · Browser Lab 2</text>
+
+    <rect x="292" y="180" width="275" height="72" rx="8" class="svg-box-refuted"/>
+    <text x="312" y="205" class="svg-label">Shortest Counterexample Trace</text>
+    <text x="312" y="227" class="svg-mono">[c1Send, c2Commit, deliverStale]</text>
+    <text x="312" y="243" class="svg-mono">Fix spec/code BEFORE proving!</text>
+
+    <path d="M 430 158 L 430 178" class="svg-arrow-refuted" marker-end="url(#arrow-refuted)"/>
+    <path d="M 292 216 L 120 216 L 120 219" class="svg-arrow-refuted"/>
+
+    <path d="M 567 92 L 628 92" class="svg-arrow-verified" marker-end="url(#arrow-verified)"/>
+
+    <rect x="632" y="26" width="272" height="226" rx="10" class="svg-box-verified"/>
+    <text x="652" y="55" class="svg-title">3. Gear 2 · Lean 4 Kernel</text>
+    <text x="652" y="80" class="svg-mono-ink">Unbounded Mathematical Proof</text>
+    <text x="652" y="106" class="svg-mono">• Init s → Inv s</text>
+    <text x="652" y="126" class="svg-mono">• Inv s → Next s s' → Inv s'</text>
+    <text x="652" y="146" class="svg-mono">• abs (compact s) = abs s</text>
+    <text x="652" y="168" class="svg-mono">• BitVec 64 wrap-around sealed</text>
+    <text x="652" y="196" class="svg-label">Infinite epochs &amp; 2^64 states</text>
+    <text x="652" y="222" class="svg-mono-ink">Chapters 08–12 · Zero sorry</text>
+  </svg>
+  <figcaption class="diagram-caption">
+    <strong>Architecture 1 — The Two-Gear Verification Loop:</strong> Never burn hours attempting an inductive proof on a buggy protocol. Gear 1 falsifies shallow bugs with concrete traces in milliseconds; Gear 2 seals unbounded epochs, arbitrary message reorderings, and 64-bit hardware boundaries inside Lean's tiny trusted kernel.
+  </figcaption>
+</figure>
+    <figure class="diagram-figure">
+  <svg class="diagram-svg" viewBox="0 0 920 265" role="img" aria-labelledby="svg-verigate-title svg-verigate-desc">
+    <title id="svg-verigate-title">The AI Vericoding Gate: Locked Human Spec vs Untrusted Coding Agent</title>
+    <desc id="svg-verigate-desc">Human engineers lock Spec.lean and non-vacuity witnesses while untrusted AI agents synthesize Impl.lean and tactic proofs; lake exe verigate blocks all 9 exploit vectors before deployment or oracle fuzzing.</desc>
+    <defs>
+      <marker id="vg-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 10 5 L 0 9 z" class="svg-head-accent"/>
+      </marker>
+      <marker id="vg-verified" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 10 5 L 0 9 z" class="svg-head-verified"/>
+      </marker>
+      <marker id="vg-refuted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 10 5 L 0 9 z" class="svg-head-refuted"/>
+      </marker>
+    </defs>
+
+    <rect x="16" y="22" width="248" height="102" rx="10" class="svg-box-accent"/>
+    <text x="34" y="49" class="svg-title">Human TCB · Spec.lean</text>
+    <text x="34" y="72" class="svg-mono-ink">SHA-256 Pinned · Read-Only</text>
+    <text x="34" y="93" class="svg-mono">Domain types + Soundness</text>
+    <text x="34" y="111" class="svg-mono">+ Non-vacuity (∃ x, Pre x)</text>
+
+    <rect x="16" y="142" width="248" height="102" rx="10" class="svg-box"/>
+    <text x="34" y="169" class="svg-title">Untrusted Agent · Impl.lean</text>
+    <text x="34" y="192" class="svg-mono-ink">100x Fast Synthesis, Zero Trust</text>
+    <text x="34" y="213" class="svg-mono">Optimized algorithms + tactics</text>
+    <text x="34" y="231" class="svg-mono">(may attempt spec-gaming!)</text>
+
+    <path d="M 264 74 L 328 112" class="svg-arrow-accent" marker-end="url(#vg-accent)"/>
+    <path d="M 264 192 L 328 152" class="svg-arrow-accent" marker-end="url(#vg-accent)"/>
+
+    <rect x="332" y="34" width="286" height="196" rx="10" class="svg-box-verified"/>
+    <text x="352" y="63" class="svg-title">lake exe verigate (CI Gate)</text>
+    <text x="352" y="88" class="svg-mono-ink">1. Lean Kernel Typecheck</text>
+    <text x="352" y="110" class="svg-mono">2. Spec SHA-256 Integrity Check</text>
+    <text x="352" y="130" class="svg-mono">3. Axiom Whitelist (Tier 0 / Tier 1)</text>
+    <text x="352" y="150" class="svg-mono">4. Ban @[implemented_by] / @[extern]</text>
+    <text x="352" y="170" class="svg-mono">5. Ban raw native_decide &amp; sorryAx</text>
+    <text x="352" y="190" class="svg-mono">6. Verify Non-Vacuity Witness</text>
+    <text x="352" y="214" class="svg-mono-ink">Chapters 13–14 · Browser Lab 6</text>
+
+    <path d="M 618 92 L 676 68" class="svg-arrow-refuted" marker-end="url(#vg-refuted)"/>
+    <rect x="680" y="24" width="224" height="86" rx="8" class="svg-box-refuted"/>
+    <text x="698" y="50" class="svg-label">Reject Cheating PRs</text>
+    <text x="698" y="72" class="svg-mono">sorry · custom axiom · csimp</text>
+    <text x="698" y="92" class="svg-mono">False → Safe · Spec drift</text>
+
+    <path d="M 618 168 L 676 184" class="svg-arrow-verified" marker-end="url(#vg-verified)"/>
+    <rect x="680" y="134" width="224" height="106" rx="8" class="svg-box-verified"/>
+    <text x="698" y="160" class="svg-label">Verified Artifact + Oracle</text>
+    <text x="698" y="182" class="svg-mono-ink">lake exe oracle</text>
+    <text x="698" y="203" class="svg-mono">Differential-fuzz Rust, Go,</text>
+    <text x="698" y="221" class="svg-mono">TS &amp; Python in CI (Ch 16)</text>
+  </svg>
+  <figcaption class="diagram-caption">
+    <strong>Architecture 2 — The AI Vericoding Gate:</strong> Coding agents share correlated blind spots when writing both code and unit tests. Locking human-owned specifications and auditing kernel axioms/attributes turns Lean 4 into an unforgeable sandbox for AI-generated software.
+  </figcaption>
+</figure>
+  </section>
+
+  <section id="curriculum" aria-labelledby="curriculum-heading">
+    <h2 id="curriculum-heading">Complete 4-Part Curriculum (16 Chapters + 4 Checkpoints)</h2>
+    <p>Progress is stored locally in your browser (<code>localStorage["indicogni.proveit.v1"]</code>) and never transmitted anywhere.</p>
+    <details class="part-details" open>
+      <summary class="part-summary">
+        <span>Part I · Executable Specifications &amp; Gear 1 Model Checking</span>
+        <span class="badge">5 units</span>
+      </summary>
+      <ul class="chapter-list">
+      <li>
+        <a class="chapter-row" href="chapters/01.html" data-unit-row="01">
+          <span class="chapter-num">Ch 01</span>
+          <span class="chapter-info">
+            <strong>Silent Truncation Bug</strong>
+            <span>Why natural-number subtraction breaks an AI-written rate limiter—and how Lean&#x27;s kernel catches what 10,000 unit tests miss.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      <li>
+        <a class="chapter-row" href="chapters/02.html" data-unit-row="02">
+          <span class="chapter-num">Ch 02</span>
+          <span class="chapter-info">
+            <strong>Illegal States &amp; Domain Modeling</strong>
+            <span>Eliminating boolean-soup authentication structs with algebraic sum and product types.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      <li>
+        <a class="chapter-row" href="chapters/03.html" data-unit-row="03">
+          <span class="chapter-num">Ch 03</span>
+          <span class="chapter-info">
+            <strong>Compile-Time Exhaustion &amp; Boolean Reflection</strong>
+            <span>Verifying finite RBAC permission matrices automatically with `Decidable`, `decide`, and `Bool ↔ Prop` bridges.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      <li>
+        <a class="chapter-row" href="chapters/04.html" data-unit-row="04">
+          <span class="chapter-num">Ch 04</span>
+          <span class="chapter-info">
+            <strong>Gear 1: TLA+ Model Checker in 35 Lines</strong>
+            <span>Demystifying state-space exploration by building a breadth-first protocol bug-finder from scratch.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      <li>
+        <a class="chapter-row is-checkpoint" href="chapters/cp1.html" data-unit-row="cp1">
+          <span class="chapter-num">CP 1</span>
+          <span class="chapter-info">
+            <strong>Checkpoint 1: Zero-Panic Rollout Router</strong>
+            <span>Closed-notes synthesis: model a canary rollout state machine, run Gear 1 search, and prove fail-closed safety.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      </ul>
+    </details>
+    <details class="part-details" open>
+      <summary class="part-summary">
+        <span>Part II · The Proof Engine &amp; Gear 2 Inductive Invariants</span>
+        <span class="badge">5 units</span>
+      </summary>
+      <ul class="chapter-list">
+      <li>
+        <a class="chapter-row" href="chapters/05.html" data-unit-row="05">
+          <span class="chapter-num">Ch 05</span>
+          <span class="chapter-info">
+            <strong>Proofs Are Programs, Goals Are Stack Traces</strong>
+            <span>Reading the Lean Infoview cleanly and mastering `→`, `∧`, `∨`, `¬`, `∀`, and `∃` as typed API contracts.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      <li>
+        <a class="chapter-row" href="chapters/06.html" data-unit-row="06">
+          <span class="chapter-num">Ch 06</span>
+          <span class="chapter-info">
+            <strong>Control Flow, Rewriting &amp; Linear Math</strong>
+            <span>Verifying real branching code cleanly with `fun_cases`, surgical `simp only`, `omega`, and `@[grind =]` / `grind`.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      <li>
+        <a class="chapter-row" href="chapters/07.html" data-unit-row="07">
+          <span class="chapter-num">Ch 07</span>
+          <span class="chapter-info">
+            <strong>Unprovable on Purpose</strong>
+            <span>How to read a stuck Infoview goal and triage between (A) Buggy Code, (B) False Spec, and (C) Weak Invariant.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      <li>
+        <a class="chapter-row" href="chapters/08.html" data-unit-row="08">
+          <span class="chapter-num">Ch 08</span>
+          <span class="chapter-info">
+            <strong>Gear 2: Inductive Invariants &amp; Strengthening</strong>
+            <span>Why true safety properties fail naive induction on &#x27;Garden-of-Eden&#x27; states—and how invariant strengthening seals infinite runs.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      <li>
+        <a class="chapter-row is-checkpoint" href="chapters/cp2.html" data-unit-row="cp2">
+          <span class="chapter-num">CP 2</span>
+          <span class="chapter-info">
+            <strong>Checkpoint 2: Crash-Safe WAL Ledger</strong>
+            <span>Repair a write-ahead log replay double-credit bug, strengthen the ledger invariant, and prove conservation across arbitrary crash loops.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      </ul>
+    </details>
+    <details class="part-details" open>
+      <summary class="part-summary">
+        <span>Part III · Precision Types, 64-Bit Hardware &amp; Refinement</span>
+        <span class="badge">5 units</span>
+      </summary>
+      <ul class="chapter-list">
+      <li>
+        <a class="chapter-row" href="chapters/09.html" data-unit-row="09">
+          <span class="chapter-num">Ch 09</span>
+          <span class="chapter-info">
+            <strong>Packing Proofs into Types (`Subtype` &amp; `Fin`)</strong>
+            <span>Bundling invariants directly inside data structures with zero-byte runtime overhead.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      <li>
+        <a class="chapter-row" href="chapters/10.html" data-unit-row="10">
+          <span class="chapter-num">Ch 10</span>
+          <span class="chapter-info">
+            <strong>64-Bit Hardware Truth (`UInt64` &amp; `BitVec`)</strong>
+            <span>Catching `2^64 - 1` wrap-around blind spots with `bv_decide` and auditing LRAT trust tiers.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      <li>
+        <a class="chapter-row" href="chapters/11.html" data-unit-row="11">
+          <span class="chapter-num">Ch 11</span>
+          <span class="chapter-info">
+            <strong>Pure Effects &amp; Termination as DoS Defense</strong>
+            <span>Functional cores (`Except`, `StateM`), `termination_by` proofs against infinite-loop outages, and `fun_induction`.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      <li>
+        <a class="chapter-row" href="chapters/12.html" data-unit-row="12">
+          <span class="chapter-num">Ch 12</span>
+          <span class="chapter-info">
+            <strong>Refinement Mappings &amp; Stuttering Steps</strong>
+            <span>Proving a fast log-structured cache+tombstone KV store behaves identically to a 10-line abstract map.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      <li>
+        <a class="chapter-row is-checkpoint" href="chapters/cp3.html" data-unit-row="cp3">
+          <span class="chapter-num">CP 3</span>
+          <span class="chapter-info">
+            <strong>Checkpoint 3: Fixed-Width Ring Buffer</strong>
+            <span>Prove bounds safety and FIFO queue refinement for a bounded circular buffer.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      </ul>
+    </details>
+    <details class="part-details" open>
+      <summary class="part-summary">
+        <span>Part IV · AI-Native Verification &amp; Monday-Morning Transfer</span>
+        <span class="badge">5 units</span>
+      </summary>
+      <ul class="chapter-list">
+      <li>
+        <a class="chapter-row" href="chapters/13.html" data-unit-row="13">
+          <span class="chapter-num">Ch 13</span>
+          <span class="chapter-info">
+            <strong>How AI Cheats Formal Verification</strong>
+            <span>Auditing the 9 real-world exploit vectors coding agents use to green-light broken proofs—and stopping every single one.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      <li>
+        <a class="chapter-row" href="chapters/14.html" data-unit-row="14">
+          <span class="chapter-num">Ch 14</span>
+          <span class="chapter-info">
+            <strong>Spec-First Agentic Co-Design</strong>
+            <span>Structuring `Spec.lean` vs `Impl.lean` so untrusted coding agents synthesize fast code and proofs at 10x speed safely.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      <li>
+        <a class="chapter-row" href="chapters/15.html" data-unit-row="15">
+          <span class="chapter-num">Ch 15</span>
+          <span class="chapter-info">
+            <strong>Verified Wire Formats (TLV Framing)</strong>
+            <span>Eliminating parser differentials and TCP stream-smuggling bugs with `decode (encode pkt ++ rest) = some (pkt, rest)`.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      <li>
+        <a class="chapter-row" href="chapters/16.html" data-unit-row="16">
+          <span class="chapter-num">Ch 16</span>
+          <span class="chapter-info">
+            <strong>Monday-Morning Transfer (`lake exe oracle`)</strong>
+            <span>Using Lean 4 as a Reference Differential Oracle for Rust, Go, TypeScript, Python, and C++ services.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      <li>
+        <a class="chapter-row is-checkpoint" href="chapters/cp4.html" data-unit-row="cp4">
+          <span class="chapter-num">CP 4</span>
+          <span class="chapter-info">
+            <strong>Checkpoint 4: Red-Team Audit of an AI Batch Escrow</strong>
+            <span>Final boss checkpoint: uncover 3 planted AI exploits in a 64-bit batch escrow submission, restore the spec, and seal kernel soundness.</span>
+          </span>
+          <span class="chapter-status-pill" data-unit-status>Unread</span>
+        </a>
+      </li>
+      </ul>
+    </details>
+
+  </section>
+
+  <section aria-labelledby="capstones-heading">
+    <h2 id="capstones-heading">The 4 Production Capstones</h2>
+    <div class="grid-2">
+      <article class="card card-elevated">
+        <span class="badge badge-accent">Capstone 01 · Cloud Security</span>
+        <h3>CedarLite — Cloud IAM Policy Engine &amp; Optimizer</h3>
+        <p>Inspired by AWS&#x27;s Lean-verified Cedar authorization engine. Model principals, actions, resources, and `permit`/`forbid` policy sets, then build a policy constant-folder/dead-rule eliminator and prove three non-negotiable security theorems.</p>
+        <p><code>ProveIt/Capstones/CedarLite.lean</code></p>
+        <a class="btn btn-sm" href="capstones/index.html#cedar-lite">Inspect Capstone &amp; Run in Browser →</a>
+      </article>
+      <article class="card card-elevated">
+        <span class="badge badge-accent">Capstone 02 · Distributed Systems</span>
+        <h3>FencingKV — Split-Brain Leases &amp; Tombstone Compaction</h3>
+        <p>Full Two-Gear TLA+-in-Lean distributed verification: use Gear 1 BFS to reproduce a GC-pause split-brain write on unfenced storage, then prove Gear 2 unbounded inductive epoch monotonicity AND tombstone-compaction refinement.</p>
+        <p><code>ProveIt/Capstones/FencingKV.lean</code></p>
+        <a class="btn btn-sm" href="capstones/index.html#fencing-kv">Inspect Capstone &amp; Run in Browser →</a>
+      </article>
+      <article class="card card-elevated">
+        <span class="badge badge-accent">Capstone 03 · Compilers &amp; Runtimes</span>
+        <h3>StackVM — Verified Optimizing Compiler &amp; Bytecode VM</h3>
+        <p>Compile an expression AST with variables, arithmetic, and conditionals into flat stack-machine bytecode, write an algebraic constant-folding optimizer, and prove end-to-end semantic preservation for arbitrary code continuations.</p>
+        <p><code>ProveIt/Capstones/StackVM.lean</code></p>
+        <a class="btn btn-sm" href="capstones/index.html#stack-vm">Inspect Capstone &amp; Run in Browser →</a>
+      </article>
+      <article class="card card-elevated">
+        <span class="badge badge-accent">Capstone 04 · AI Safety &amp; Polyglot CI</span>
+        <h3>VeriGate &amp; Oracle — AI Proof-Carrying Gate &amp; Differential Fuzzer</h3>
+        <p>Build the supervision harness that lets autonomous coding agents write fast implementations without compromising soundness: lock `Spec` hashes, audit axioms/attributes against `RedTeam/` exploits, and differential-fuzz external services.</p>
+        <p><code>ProveIt/Capstones/VeriGate.lean</code></p>
+        <a class="btn btn-sm" href="capstones/index.html#verigate-oracle">Inspect Capstone &amp; Run in Browser →</a>
+      </article>
+
+    </div>
+  </section>
+
+  <section aria-labelledby="ref-heading">
+    <h2 id="ref-heading">Field Reference &amp; Monday-Morning Playbooks</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3><a href="reference/tla-to-lean.html">TLA+ ↔ Lean 4 Rosetta Stone</a></h3>
+        <p>Side-by-side translation of <code>VARIABLES</code>, <code>Init</code>, <code>Next</code>, <code>UNCHANGED</code>, TLC BFS, inductive invariants, and stuttering refinement.</p>
+      </div>
+      <div class="card">
+        <h3><a href="reference/ai-playbook.html">Spec-First AI Playbook &amp; Polyglot Oracle</a></h3>
+        <p>Copyable agent prompts, <code>VeriGate</code> GitHub Actions workflow, and Rust / Go / TypeScript / Python differential-fuzzing harnesses.</p>
+      </div>
+    </div>
+  </section>
+</main>
+<div class="modal-backdrop" id="shortcut-modal" hidden role="dialog" aria-modal="true" aria-labelledby="shortcut-modal-title">
+  <div class="modal-dialog">
+    <div class="prediction-header">
+      <h3 id="shortcut-modal-title">Keyboard Shortcuts</h3>
+      <button type="button" class="btn btn-sm" data-action="close-shortcuts">Close (Esc)</button>
+    </div>
+    <div class="shortcut-row"><span>Step tactic forward in Infoview</span><kbd>j</kbd></div>
+    <div class="shortcut-row"><span>Step tactic backward in Infoview</span><kbd>k</kbd></div>
+    <div class="shortcut-row"><span>Previous unit / chapter</span><kbd>[</kbd></div>
+    <div class="shortcut-row"><span>Next unit / chapter</span><kbd>]</kbd></div>
+    <div class="shortcut-row"><span>Toggle Light / Dark theme</span><kbd>t</kbd></div>
+    <div class="shortcut-row"><span>Open or close this help dialog</span><kbd>?</kbd></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <strong>Indicogni LLC</strong> · <em>Prove It: Formally Verified Software in Lean 4</em><br>
+      Pinned to zero-dependency Core/<code>Std</code> Lean <code>v4.36.0</code>. Zero cookies, zero analytics, zero tracking.
+    </div>
+    <div>
+      Code: MIT · Prose &amp; SVG Diagrams: CC BY 4.0 · Feedback &amp; security: <code>feedback@indicogni.com</code><br>
+      <a href="https://github.com/indicogni/prove-it" target="_blank" rel="noopener noreferrer">github.com/indicogni/prove-it</a> ·
+      <a href="https://live.lean-lang.org/" target="_blank" rel="noopener noreferrer">live.lean-lang.org</a>
+    </div>
+  </div>
+</footer>
+  <script type="module" src="assets/app.js"></script>
+</body>
+</html>

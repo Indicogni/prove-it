@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';">
+  <meta name="referrer" content="no-referrer">
+  <title>CP 3: Checkpoint 3: Fixed-Width Ring Buffer — Prove It (Indicogni)</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-unit-id="cp3" data-unit-title="CP 3: Checkpoint 3: Fixed-Width Ring Buffer" data-prev-href="12.html" data-next-href="13.html">
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand-link" href="../index.html">
+      <span class="brand-org">indicogni</span>
+      <span class="brand-sep">/</span>
+      <span class="brand-title">Prove It</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="../index.html#curriculum" aria-current="page">Curriculum</a>
+      <a class="nav-link" href="../labs/index.html">6 Live Labs</a>
+      <a class="nav-link" href="../capstones/index.html">4 Capstones</a>
+      <a class="nav-link" href="../reference/tla-to-lean.html">TLA+ ↔ Lean</a>
+      <a class="nav-link" href="../reference/ai-playbook.html">AI Playbook</a>
+      <a class="nav-link" href="../reference/glossary.html">Glossary</a>
+    </nav>
+    <div class="nav-controls">
+      <span class="progress-pill" data-progress-summary>0/20 units · 0/6 labs</span>
+      <button type="button" class="icon-btn" data-action="open-shortcuts" title="Keyboard shortcuts (?)">Shortcuts (?)</button>
+      <button type="button" class="icon-btn" data-action="toggle-theme">Dark theme (t)</button>
+    </div>
+  </div>
+</header>
+<main class="chapter-shell">
+  <div class="chapter-header">
+    <div class="chapter-topbar">
+      <span class="badge badge-accent">Part III · Checkpoint 3</span>
+      <span class="badge">CP 3 · 45 min · <code>ProveIt/Checkpoints/Cp3.lean</code></span>
+    </div>
+    <h1>Checkpoint 3: Fixed-Width Ring Buffer</h1>
+    <p class="hero-subtitle">Prove bounds safety and FIFO queue refinement for a bounded circular buffer.</p>
+
+    <div class="puzzle-box">
+      <span class="puzzle-title">Checkpoint Spec · Bounded Circular Queue vs. Abstract `List α`</span>
+      <pre><code>-- SpecQueue: plain `List α` (`enqueue` appends at back, `dequeue` pops front, max `cap`).
+-- RingBuf: fixed capacity `cap &gt; 0`, modular index arithmetic `(head + len) % cap`.
+-- Prove: (1) zero out-of-bounds indices, (2) `toList (push rb x) = toList rb ++ [x]` when `len &lt; cap`.</code></pre>
+    </div>
+
+    <section class="prediction-card" id="prediction-card" aria-labelledby="pred-heading">
+      <div class="prediction-header">
+        <strong id="pred-heading">Socratic Gate · Commit to a Prediction</strong>
+        <span class="badge badge-open" data-prediction-status>Unanswered · Locks on commit</span>
+      </div>
+      <p>In a circular ring buffer of capacity `cap &gt; 0`, why should the state store `(head : Fin cap)` and `(len : Nat)` (`len ≤ cap`) instead of just `(head : Fin cap)` and `(tail : Fin cap)`?</p>
+      <div class="prediction-options" data-prediction-options></div>
+      <button type="button" class="btn btn-primary btn-sm" data-action="lock-prediction" disabled>Lock Prediction &amp; Reveal Mechanism</button>
+      <div class="prediction-reveal" data-prediction-reveal hidden>
+        <strong>Why this happens:</strong>
+        <p data-prediction-explanation></p>
+      </div>
+    </section>
+  </div>
+
+  <article class="container-prose">
+    <h2>Bringing `Fin`, Modular Arithmetic, and Refinement Together</h2>
+    <p>Kernel network rings (<code>io_uring</code>, DPDK) and telemetry queues use fixed-capacity circular buffers to guarantee zero heap allocation on hot paths. Proving that modular wrap-around <code>(head + i) % cap</code> refines an ordinary <code>List α</code> FIFO queue seals off both out-of-bounds panics and silent wrap-overwrite corruption.</p>
+
+  </article>
+
+  <section class="workbench" id="chapter-workbench" aria-label="Interactive Lean 4 Infoview Stepper">
+    <div class="workbench-toolbar">
+      <div class="workbench-title">
+        <span>⊢</span>
+        <span>ProveIt/Checkpoints/Cp3.lean · Modular Slot Safety &amp; Queue Length Invariant</span>
+      </div>
+      <div class="stepper-controls">
+        <button type="button" class="btn btn-sm" data-action="step-reset">⏮ Reset</button>
+        <button type="button" class="btn btn-sm" data-action="step-prev">← Prev (k)</button>
+        <span class="step-counter" data-step-counter>Step 1 / 1</span>
+        <button type="button" class="btn btn-sm btn-primary" data-action="step-next">Next (j) →</button>
+      </div>
+    </div>
+
+    <div class="workbench-split">
+      <div class="code-pane" aria-label="Lean 4 source code">
+        <div class="code-lines" data-code-lines></div>
+      </div>
+      <div class="infoview-pane" aria-live="polite" aria-label="Simulated Lean 4 Infoview">
+        <div class="infoview-header">
+          <span class="infoview-title">Lean Infoview</span>
+          <span class="badge badge-open" data-goal-badge>Open Goal</span>
+        </div>
+        <div>
+          <span class="infoview-section-label">Objects</span>
+          <div class="infoview-block" data-infoview-objects></div>
+        </div>
+        <div>
+          <span class="infoview-section-label">Hypotheses</span>
+          <div class="infoview-block" data-infoview-hyps></div>
+        </div>
+        <div>
+          <span class="infoview-section-label">⊢ Current Goal</span>
+          <div class="infoview-block infoview-goal" data-infoview-goal></div>
+        </div>
+        <div class="infoview-note" data-infoview-note></div>
+      </div>
+    </div>
+
+    <div class="workbench-footer">
+      <div class="action-group">
+        <a class="btn btn-primary btn-sm" data-playground-link href="https://live.lean-lang.org/#code=--%20Checkpoint%203%3A%20Fixed-Width%20Ring%20Buffer%20Bounds%20%26%20Refinement%0Astructure%20RingMeta%20%28cap%20%3A%20Nat%29%20where%0A%20%20head%20%20%3A%20Nat%0A%20%20len%20%20%20%3A%20Nat%0A%20%20h_cap%20%3A%200%20%3C%20cap%0A%20%20h_len%20%3A%20len%20%E2%89%A4%20cap%0A%0Adef%20writeSlot%20%7Bcap%20%3A%20Nat%7D%20%28r%20%3A%20RingMeta%20cap%29%20%3A%20Fin%20cap%20%3A%3D%0A%20%20%E2%9F%A8%28r.head%20%2B%20r.len%29%20%25%20cap%2C%20Nat.mod_lt%20_%20r.h_cap%E2%9F%A9%0A%0Adef%20pushMeta%20%7Bcap%20%3A%20Nat%7D%20%28r%20%3A%20RingMeta%20cap%29%20%3A%20Option%20%28RingMeta%20cap%29%20%3A%3D%0A%20%20if%20h%20%3A%20r.len%20%3C%20cap%20then%0A%20%20%20%20some%20%7B%20r%20with%20len%20%3A%3D%20r.len%20%2B%201%2C%20h_len%20%3A%3D%20by%20omega%20%7D%0A%20%20else%20none%0A%0Atheorem%20pushMeta_increments%20%7Bcap%20%3A%20Nat%7D%20%28r%20r%27%20%3A%20RingMeta%20cap%29%0A%20%20%20%20%28h%20%3A%20pushMeta%20r%20%3D%20some%20r%27%29%20%3A%20r%27.len%20%3D%20r.len%20%2B%201%20%3A%3D%20by%0A%20%20unfold%20pushMeta%20at%20h%0A%20%20split%20at%20h%0A%20%20%C2%B7%20simp%20only%20%5BOption.some.injEq%5D%20at%20h%3B%20subst%20h%3B%20rfl%0A%20%20%C2%B7%20contradiction%0A" target="_blank" rel="noopener noreferrer">Run in Lean 4 Playground ↗</a>
+        <button type="button" class="btn btn-sm" data-action="copy-lean">Copy Lean snippet</button>
+      </div>
+      <div class="action-group">
+        <button type="button" class="btn btn-sm" data-copy-text="lake exe check cp3">Copy local command: <code>lake exe check cp3</code></button>
+      </div>
+    </div>
+  </section>
+
+  <div class="container-prose">
+    <div class="callout callout-verified">
+      <strong>Hands-On Exercise (ProveIt/Checkpoints/Cp3.lean):</strong>
+      <p>Complete the full array-backed FIFO ring buffer refinement in `ProveIt/Checkpoints/Cp3.lean` and run `lake exe check cp3`.</p>
+    </div>
+
+    <div class="chapter-complete-bar">
+      <div>
+        <strong>Finished the Socratic gate, Infoview trace, and playground run?</strong><br>
+        <span>Record completion in local browser storage to track your 20-unit progress.</span>
+      </div>
+      <button type="button" class="btn btn-verified" data-action="toggle-complete">Mark chapter complete</button>
+    </div>
+
+    <nav class="chapter-pager" aria-label="Chapter pagination">
+      <a class="pager-card" href="12.html"><span class="pager-dir">← Previous ([) · Ch 12</span><span class="pager-title">Refinement Mappings &amp; Stuttering Steps</span></a>
+      <a class="pager-card align-right" href="13.html"><span class="pager-dir">Next (]) · Ch 13 →</span><span class="pager-title">How AI Cheats Formal Verification</span></a>
+    </nav>
+  </div>
+</main>
+<div class="modal-backdrop" id="shortcut-modal" hidden role="dialog" aria-modal="true" aria-labelledby="shortcut-modal-title">
+  <div class="modal-dialog">
+    <div class="prediction-header">
+      <h3 id="shortcut-modal-title">Keyboard Shortcuts</h3>
+      <button type="button" class="btn btn-sm" data-action="close-shortcuts">Close (Esc)</button>
+    </div>
+    <div class="shortcut-row"><span>Step tactic forward in Infoview</span><kbd>j</kbd></div>
+    <div class="shortcut-row"><span>Step tactic backward in Infoview</span><kbd>k</kbd></div>
+    <div class="shortcut-row"><span>Previous unit / chapter</span><kbd>[</kbd></div>
+    <div class="shortcut-row"><span>Next unit / chapter</span><kbd>]</kbd></div>
+    <div class="shortcut-row"><span>Toggle Light / Dark theme</span><kbd>t</kbd></div>
+    <div class="shortcut-row"><span>Open or close this help dialog</span><kbd>?</kbd></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <strong>Indicogni LLC</strong> · <em>Prove It: Formally Verified Software in Lean 4</em><br>
+      Pinned to zero-dependency Core/<code>Std</code> Lean <code>v4.36.0</code>. Zero cookies, zero analytics, zero tracking.
+    </div>
+    <div>
+      Code: MIT · Prose &amp; SVG Diagrams: CC BY 4.0 · Feedback &amp; security: <code>feedback@indicogni.com</code><br>
+      <a href="https://github.com/indicogni/prove-it" target="_blank" rel="noopener noreferrer">github.com/indicogni/prove-it</a> ·
+      <a href="https://live.lean-lang.org/" target="_blank" rel="noopener noreferrer">live.lean-lang.org</a>
+    </div>
+  </div>
+</footer>
+  <script type="module" src="../assets/app.js"></script>
+</body>
+</html>
