@@ -91,6 +91,7 @@ GENERIC_RUNTIME_TOKENS = frozenset({
 SKIP_DIRS = frozenset({
     ".git",
     ".lake",
+    ".wrangler",
     "build",
     "__pycache__",
     ".mypy_cache",

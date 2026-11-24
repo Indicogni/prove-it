@@ -1,0 +1,10 @@
+{
+  "name": "indicogni-prove-it",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "python3 scripts/build_site.py",
+    "dev": "python3 scripts/build_site.py && npx --yes wrangler dev --local --port 8788",
+    "deploy": "python3 scripts/build_site.py && npx --yes wrangler deploy"
+  }
+}

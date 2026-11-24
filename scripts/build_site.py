@@ -9,11 +9,15 @@ from __future__ import annotations
 
 import html
 import json
+import shutil
 import urllib.parse
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 SITE_DIR = ROOT_DIR / "site"
+DIST_DIR = ROOT_DIR / "dist"
+MOUNT_PATH = "/learn/prove-it"
+CANONICAL_BASE = f"https://indicogni.com{MOUNT_PATH}"
 
 PARTS = [
     {
@@ -2544,7 +2548,19 @@ def esc(text: str) -> str:
     return html.escape(text, quote=True)
 
 
-def render_head(title: str, rel_prefix: str) -> str:
+DEFAULT_DESC = (
+    "Free, hands-on Lean 4 formal verification course for software engineers. "
+    "Catch protocol bugs with bounded BFS, prove invariants in Lean's kernel, and gate AI-written code."
+)
+
+
+def render_head(
+    title: str,
+    rel_prefix: str,
+    canonical_subpath: str = "",
+    description: str = DEFAULT_DESC,
+    extra_meta: str = "",
+) -> str:
     csp = (
         "default-src 'self'; "
         "script-src 'self'; "
@@ -2555,15 +2571,32 @@ def render_head(title: str, rel_prefix: str) -> str:
         "base-uri 'self'; "
         "form-action 'none';"
     )
+    sub = canonical_subpath.lstrip("/")
+    canonical_url = f"{CANONICAL_BASE}/{sub}" if sub else f"{CANONICAL_BASE}/"
+    full_title = f"{title} · Prove It · indicogni"
+    canonical_tag = (
+        f'  <link rel="canonical" href="{esc(canonical_url)}">\n'
+        f'  <meta property="og:url" content="{esc(canonical_url)}">\n'
+        if canonical_subpath != "__none__"
+        else ""
+    )
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="{csp}">
-  <meta name="referrer" content="no-referrer">
-  <title>{esc(title)} — Prove It (Indicogni)</title>
-  <link rel="icon" type="image/svg+xml" href="{rel_prefix}assets/favicon.svg">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#FBF8F1" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0E1116" media="(prefers-color-scheme: dark)">
+  <title>{esc(full_title)}</title>
+  <meta name="description" content="{esc(description)}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Indicogni">
+  <meta property="og:title" content="{esc(full_title)}">
+  <meta property="og:description" content="{esc(description)}">
+{canonical_tag}{extra_meta}  <link rel="icon" type="image/svg+xml" href="{rel_prefix}assets/favicon.svg">
   <link rel="stylesheet" href="{rel_prefix}assets/style.css">
 </head>"""
 
@@ -2574,11 +2607,11 @@ def render_header(rel_prefix: str, active: str) -> str:
 
     return f"""<header class="site-header">
   <div class="nav-inner">
-    <a class="brand-link" href="{rel_prefix}index.html">
-      <span class="brand-org">indicogni</span>
-      <span class="brand-sep">/</span>
-      <span class="brand-title">Prove It</span>
-    </a>
+    <span class="brand-link">
+      <a class="brand-org" href="https://indicogni.com/">indicogni</a>
+      <span class="brand-sep" aria-hidden="true">/</span>
+      <a class="brand-title" href="{rel_prefix}index.html">Prove It</a>
+    </span>
     <nav class="nav-links" aria-label="Primary">
       <a class="nav-link" href="{rel_prefix}index.html#curriculum"{curr("curriculum")}>Curriculum</a>
       <a class="nav-link" href="{rel_prefix}labs/index.html"{curr("labs")}>6 Live Labs</a>
@@ -2812,7 +2845,7 @@ def build_landing_page() -> None:
         <a class="btn btn-sm" href="capstones/index.html#{esc(cap["id"])}">Inspect Capstone &amp; Run in Browser →</a>
       </article>\n"""
 
-    page = f"""{render_head("Formally Verified Software in Lean 4", "")}
+    page = f"""{render_head("Formally Verified Software in Lean 4", "", "")}
 <body>
 {render_header("", "curriculum")}
 <main class="container-wide">
@@ -2985,7 +3018,7 @@ def build_chapter_pages() -> None:
 
         unit_full_title = f"{u['code']}: {u['title']}"
 
-        page = f"""{render_head(unit_full_title, "../")}
+        page = f"""{render_head(unit_full_title, "../", f"chapters/{u['id']}", u["subtitle"])}
 <body data-unit-id="{u['id']}" data-unit-title="{esc(unit_full_title)}"{prev_attr}{next_attr}>
 {render_header("../", "curriculum")}
 <main class="chapter-shell">
@@ -3099,7 +3132,7 @@ def build_labs_page() -> None:
     labs_dir = SITE_DIR / "labs"
     labs_dir.mkdir(parents=True, exist_ok=True)
 
-    page = f"""{render_head("6 Interactive Browser Labs", "../")}
+    page = f"""{render_head("6 Interactive Browser Labs", "../", "labs/")}
 <body>
 {render_header("../", "labs")}
 <main class="container-wide">
@@ -3351,7 +3384,7 @@ def build_capstones_page() -> None:
     </div>
   </section>\n"""
 
-    page = f"""{render_head("4 Production Capstones", "../")}
+    page = f"""{render_head("4 Production Capstones", "../", "capstones/")}
 <body>
 {render_header("../", "capstones")}
 <main class="container-wide">
@@ -3395,7 +3428,7 @@ def build_reference_pages() -> None:
     </div>
   </article>\n"""
 
-    tla_page = f"""{render_head("TLA+ to Lean 4 Rosetta Stone", "../")}
+    tla_page = f"""{render_head("TLA+ to Lean 4 Rosetta Stone", "../", "reference/tla-to-lean")}
 <body>
 {render_header("../", "tla")}
 <main class="container-wide">
@@ -3473,7 +3506,7 @@ def build_reference_pages() -> None:
         "assert prod_actual == lean_truth, f'Divergence vs verified Lean spec: {prod_actual} != {lean_truth}'"
     )
 
-    ai_page = f"""{render_head("AI Vericoding Playbook & Polyglot Oracle Guide", "../")}
+    ai_page = f"""{render_head("AI Vericoding Playbook & Polyglot Oracle Guide", "../", "reference/ai-playbook")}
 <body>
 {render_header("../", "ai")}
 <main class="container-wide">
@@ -3592,7 +3625,7 @@ def build_reference_pages() -> None:
       <p><strong>Lean 4 Mechanism:</strong> <code>{esc(lean_mech)}</code></p>
     </article>\n"""
 
-    glossary_page = f"""{render_head("Earned-Jargon Glossary", "../")}
+    glossary_page = f"""{render_head("Earned-Jargon Glossary", "../", "reference/glossary")}
 <body>
 {render_header("../", "glossary")}
 <main class="container-wide">
@@ -3619,6 +3652,75 @@ def build_reference_pages() -> None:
     (ref_dir / "glossary.html").write_text(glossary_page, encoding="utf-8")
 
 
+def build_not_found_and_sitemap() -> None:
+    def make_404(prefix: str) -> str:
+        return f"""{render_head("Page not found", prefix, "__none__", "Page not found.", '  <meta name="robots" content="noindex">\\n')}
+<body>
+{render_header(prefix, "")}
+<main class="container-wide">
+  <section class="hero">
+    <span class="eyebrow">404 · Uninhabited Type</span>
+    <h1 class="hero-title">Page not found.</h1>
+    <p class="hero-subtitle">
+      There is no inhabitant at this URL path. Return to the course syllabus or jump into the live browser labs.
+    </p>
+    <div class="hero-cta-row">
+      <a class="btn btn-primary" href="{prefix}index.html">Go to Prove It home →</a>
+      <a class="btn" href="{prefix}labs/index.html">Open 6 Live Labs</a>
+      <a class="btn" href="https://indicogni.com/">All Indicogni courses</a>
+    </div>
+  </section>
+</main>
+{render_shortcut_modal_and_footer(prefix)}"""
+
+    (SITE_DIR / "404.html").write_text(make_404(""), encoding="utf-8")
+
+    urls = [
+        f"{CANONICAL_BASE}/",
+        f"{CANONICAL_BASE}/labs/",
+        f"{CANONICAL_BASE}/capstones/",
+        f"{CANONICAL_BASE}/reference/tla-to-lean",
+        f"{CANONICAL_BASE}/reference/ai-playbook",
+        f"{CANONICAL_BASE}/reference/glossary",
+    ]
+    for u in UNITS:
+        urls.append(f"{CANONICAL_BASE}/chapters/{u['id']}")
+
+    xml_entries = "\n".join(f"  <url><loc>{esc(loc)}</loc></url>" for loc in urls)
+    sitemap_xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"{xml_entries}\n"
+        "</urlset>\n"
+    )
+    (SITE_DIR / "sitemap.xml").write_text(sitemap_xml, encoding="utf-8")
+
+    # Build Cloudflare Worker static-assets bundle in dist/ mirroring /learn/prove-it/
+    if DIST_DIR.exists():
+        shutil.rmtree(DIST_DIR)
+    mounted_dir = DIST_DIR / MOUNT_PATH.lstrip("/")
+    mounted_dir.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(SITE_DIR, mounted_dir)
+
+    # Worker 404 page can be served at arbitrary nested paths, so anchor its asset/nav links to /learn/prove-it/
+    worker_404 = make_404(f"{MOUNT_PATH}/")
+    (mounted_dir / "404.html").write_text(worker_404, encoding="utf-8")
+    (DIST_DIR / "404.html").write_text(worker_404, encoding="utf-8")
+
+    headers_txt = (
+        "/*\n"
+        "  Strict-Transport-Security: max-age=31536000\n"
+        "  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; "
+        "img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; "
+        "form-action 'none'; frame-ancestors 'none'\n"
+        "  X-Content-Type-Options: nosniff\n"
+        "  X-Frame-Options: DENY\n"
+        "  Referrer-Policy: strict-origin-when-cross-origin\n"
+        "  Permissions-Policy: camera=(), microphone=(), geolocation=(), browsing-topics=()\n"
+    )
+    (DIST_DIR / "_headers").write_text(headers_txt, encoding="utf-8")
+
+
 def main() -> None:
     (SITE_DIR / "assets").mkdir(parents=True, exist_ok=True)
     build_chapter_data_js()
@@ -3627,7 +3729,8 @@ def main() -> None:
     build_labs_page()
     build_capstones_page()
     build_reference_pages()
-    print(f"Generated static course in {SITE_DIR} ({len(UNITS)} interactive units + labs + capstones + reference).")
+    build_not_found_and_sitemap()
+    print(f"Generated static course in {SITE_DIR} and Worker bundle in {DIST_DIR}{MOUNT_PATH}/ ({len(UNITS)} interactive units + labs + capstones + reference + sitemap).")
 
 
 if __name__ == "__main__":

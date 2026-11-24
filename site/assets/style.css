@@ -225,16 +225,18 @@ pre code {
   color: var(--ink);
 }
 
-.brand-link:hover {
-  color: var(--accent);
-}
-
 .brand-org {
   font-family: var(--font-mono);
   font-size: 0.82rem;
   letter-spacing: 0.04em;
   text-transform: lowercase;
   color: var(--muted);
+  text-decoration: none;
+}
+
+.brand-org:hover {
+  color: var(--accent);
+  text-decoration: underline;
 }
 
 .brand-sep {
@@ -247,6 +249,11 @@ pre code {
   font-weight: 700;
   font-size: 1.15rem;
   color: var(--ink);
+  text-decoration: none;
+}
+
+.brand-title:hover {
+  color: var(--accent);
 }
 
 .nav-links {

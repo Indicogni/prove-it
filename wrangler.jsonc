@@ -1,0 +1,19 @@
+// Cloudflare Worker for https://indicogni.com/learn/prove-it/
+// Static assets only: no Worker script, no bindings. `python3 scripts/build_site.py` writes
+// `dist/learn/prove-it/**` (matching the full request path), `dist/404.html`, and `dist/_headers`.
+//
+// Build first: `npm run build`. Preview locally: `npm run dev`. Deploy: `npm run deploy`.
+{
+  "name": "indicogni-prove-it",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  "routes": [
+    { "pattern": "indicogni.com/learn/prove-it*", "zone_name": "indicogni.com" }
+  ],
+  "workers_dev": false,
+  "preview_urls": false
+}
